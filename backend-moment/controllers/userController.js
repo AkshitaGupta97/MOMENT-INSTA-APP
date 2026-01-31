@@ -154,9 +154,67 @@ export const editProfile = async (req, res) => {
 export const getSuggestedUser = async(req, res) => {
     try {
         const suggestedUser = await User.find({_id:{$ne:req.id}}).select("-passsword");  // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
-        
+        if(!suggestedUser){
+            return res.status(401).json({
+                message: '❌Currently do not have any user...',
+                success: false
+            });
+        }
+        return res.status(201).json({
+            users:suggestedUser,
+            status: true
+        });
     } catch (error) {
         console.log('getSuggestedUser Error', error);
     }
 }
 
+// funtion to follow and unfollow
+export const followUnfollow = async(req, res) => {
+    try {
+        const followKarneWala = req.id; // my id
+        const whomToFollow = req.params.id; // other id
+        if(followKarneWala === whomToFollow){
+            return res.status(401).json({
+                message: '❌You cannot follow/unfollow to yourself...',
+                success: false
+            });
+        }
+        
+        const user = await User.findById({followKarneWala});
+        const targetUser = await User.findById({whomToFollow});
+
+        if(!user || !targetUser){
+            return res.status(401).json({
+                message: '❌User not found...',
+                success: false
+            });
+        }
+        // check whether to follow or unfollow
+        const isFollowing = user.following.includes(whomToFollow); //if i follow someone then it must be added to my 'following'
+        if(isFollowing){  // it means i have already followed them. if this is,  then give logic to unfollow, not follow
+            await Promise.all([
+                User.updateOne({_id:followKarneWala}, {$pull: {following: whomToFollow}}),
+                User.updateOne({_id:whomToFollow}, {$pull: {followers: followKarneWala}})
+            ]);
+            return res.status(201).json({
+                message: "😥Unfollowed successfully...",
+                status: true
+            });
+        }
+        else {  // if we didnot follow them then give follow logic
+            await Promise.all([
+                User.updateOne({_id:followKarneWala}, {$push: {following: whomToFollow}}),
+                User.updateOne({_id:whomToFollow}, {$push: {followers: followKarneWala}})
+            ]);
+            return res.status(201).json({
+                message: "😊Followed successfully...",
+                status: true
+            });
+        }
+
+
+    } catch (error) {
+        console.log('followUnfollow Error', error);
+    }
+}
