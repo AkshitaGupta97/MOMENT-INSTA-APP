@@ -1,4 +1,4 @@
-import {v1 as cloudinary} from 'cloudinary';
+import {v2 as cloudinary} from 'cloudinary';
 // i want v1 from cloudinary, so for ease we changed name as 'cloudinary
 import dotenv from 'dotenv';
 

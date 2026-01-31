@@ -1,31 +1,32 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import dotenv from 'dotenv';
+import userRoute from './routes/userRoutes.js';
 
-dotenv.config({});
+dotenv.config();
 
-const PORT = process.env.PORT || 3000
-
+const PORT = process.env.PORT || 3000;
 const app = express();
 
 // middleware
 app.use(express.json());
-app.use(cookieParser); // to store token 
-app.use(urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-const corsOption = {
-    origin: 'http://localhost:5173',  // frontend origin
-    credentials: true
-}
-app.use(cors(corsOption));
+// cors
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
-// routess
+// routes
 app.get('/', (req, res) => res.send('Server is Live!'));
+app.use('/api/v1/user', userRoute);
 
+// start server
+await connectDB();
 app.listen(PORT, () => {
-    connectDB();
-    console.log(`Server is listen on ${PORT}`);
-})
-
+  console.log(`Server listening on ${PORT}`);
+});

@@ -63,8 +63,8 @@ export const login = async (req, res) => {
             });
         }
         user = {
-            _id: user_id,
-            username: username,
+            _id: user._id,
+            username: user.username,
             email: user.email,
             profilePicture: user.profilePicture,
             bio: user.bio,
@@ -73,9 +73,18 @@ export const login = async (req, res) => {
             posts: user.posts
         }
         // create token
-        const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KET, { expiresIn: '1d' });
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.SECRET_KEY,
+            { expiresIn: '1d' }
+        );
 
-        return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
+        res.cookie('token', token, {
+            httpOnly: true,
+            sameSite: 'lax',   // 👈 use lax for dev
+            secure: false,     // true only in production HTTPS
+            maxAge: 24 * 60 * 60 * 1000
+        }).json({
             message: `😊Welcome back ${user.username}`,
             success: true,
             user
@@ -102,7 +111,7 @@ export const logout = async (_, res) => {
 export const getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
-        let user = await User.findById({ userId });
+        let user = await User.findById(userId).select('-password');
         return res.status(200).json({
             user,
             success: true
@@ -114,77 +123,93 @@ export const getProfile = async (req, res) => {
 
 // controller editProfile 
 export const editProfile = async (req, res) => {
-    try {
-        const userId = req.id; // comes from middleware
-        const {bio, gender} = req.body;
-        const{profilePicture} = req.file;  // images, video are file so we get it from req.file
+  try {
+    const userId = req.id; // from isAuthenticated middleware
+    const { bio, gender } = req.body;
+    const profilePicture = req.file; // ✅ correct = images, video are file so we get it from req.file
 
-        let cloudResponse;
+    let cloudResponse;
 
-        if(profilePicture){
-            const fileUri = getDataUri(profilePicture);
-            cloudResponse = await cloudinary.uploader.upload(fileUri);
-        }
-
-        const user = await User.findById({userId});
-        if(!user){
-            return res.status(401).json({
-                message: '❌User not found...',
-                success: false
-            });
-        }
-
-        if(bio) urer.bio = bio;
-        if(gender) user.gender = gender;
-        if(profilePicture) user.profilePicture = cloudResponse.secure_url;
-
-        await user.save();
-
-        return res.status(201).json({
-            message: "😊Profile Updated...",
-            status: true
-        });
-
-    } catch (error) {
-        console.log('editProfile Error', error);
+    if (profilePicture) {
+      const fileUri = getDataUri(profilePicture); // expects file
+      cloudResponse = await cloudinary.uploader.upload(fileUri);
     }
-}
+
+    const user = await User.findById(userId).select('-password');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: '❌ User not found'
+      });
+    }
+
+    if (bio) user.bio = bio;
+    if (gender) user.gender = gender;
+    if (cloudResponse) user.profilePicture = cloudResponse.secure_url;
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: '😊 Profile updated successfully',
+      user
+    });
+
+  } catch (error) {
+    console.error('editProfile Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 
 // function to get suggested user
-export const getSuggestedUser = async(req, res) => {
-    try {
-        const suggestedUser = await User.find({_id:{$ne:req.id}}).select("-passsword");  // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
-        if(!suggestedUser){
-            return res.status(401).json({
-                message: '❌Currently do not have any user...',
-                success: false
-            });
-        }
-        return res.status(201).json({
-            users:suggestedUser,
-            status: true
-        });
-    } catch (error) {
-        console.log('getSuggestedUser Error', error);
+export const getSuggestedUser = async (req, res) => {
+  try {
+    const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select('-password'); // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
+
+    if (suggestedUsers.length === 0) {
+      return res.status(200).json({
+        success: true,
+        users: [],
+        message: 'No suggested users available'
+      });
     }
-}
+
+    return res.status(200).json({
+      success: true,
+      users: suggestedUsers
+    });
+
+  } catch (error) {
+    console.error('getSuggestedUser Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 
 // funtion to follow and unfollow
-export const followUnfollow = async(req, res) => {
+export const followUnfollow = async (req, res) => {
     try {
         const followKarneWala = req.id; // my id
         const whomToFollow = req.params.id; // other id
-        if(followKarneWala === whomToFollow){
+
+        if (followKarneWala.toString() === whomToFollow.toString()) {  // req.id is usually a string , user.following contains ObjectIds
             return res.status(401).json({
                 message: '❌You cannot follow/unfollow to yourself...',
                 success: false
             });
         }
-        
-        const user = await User.findById({followKarneWala});
-        const targetUser = await User.findById({whomToFollow});
 
-        if(!user || !targetUser){
+        const user = await User.findById(followKarneWala);
+        const targetUser = await User.findById(whomToFollow);
+
+        if (!user || !targetUser) {
             return res.status(401).json({
                 message: '❌User not found...',
                 success: false
@@ -192,10 +217,10 @@ export const followUnfollow = async(req, res) => {
         }
         // check whether to follow or unfollow
         const isFollowing = user.following.includes(whomToFollow); //if i follow someone then it must be added to my 'following'
-        if(isFollowing){  // it means i have already followed them. if this is,  then give logic to unfollow, not follow
+        if (isFollowing) {  // it means i have already followed them. if this is,  then give logic to unfollow, not follow
             await Promise.all([
-                User.updateOne({_id:followKarneWala}, {$pull: {following: whomToFollow}}),
-                User.updateOne({_id:whomToFollow}, {$pull: {followers: followKarneWala}})
+                User.updateOne({ _id: followKarneWala }, { $pull: { following: whomToFollow } }),
+                User.updateOne({ _id: whomToFollow }, { $pull: { followers: followKarneWala } })
             ]);
             return res.status(201).json({
                 message: "😥Unfollowed successfully...",
@@ -204,12 +229,12 @@ export const followUnfollow = async(req, res) => {
         }
         else {  // if we didnot follow them then give follow logic
             await Promise.all([
-                User.updateOne({_id:followKarneWala}, {$push: {following: whomToFollow}}),
-                User.updateOne({_id:whomToFollow}, {$push: {followers: followKarneWala}})
+                User.updateOne({ _id: followKarneWala }, { $push: { following: whomToFollow } }),
+                User.updateOne({ _id: whomToFollow }, { $push: { followers: followKarneWala } })
             ]);
             return res.status(201).json({
                 message: "😊Followed successfully...",
-                status: true
+                success: true
             });
         }
 

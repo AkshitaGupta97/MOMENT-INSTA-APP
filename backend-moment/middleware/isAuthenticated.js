@@ -6,7 +6,7 @@ const isAuthenticated = async (req, res, next) => {
         if(!token){
             return res.send({success: false, message: "User not Authenticated!"});
         }
-        const decode = await jwt.verify(token, process.env.SECRET_KET);
+        const decode = jwt.verify(token, process.env.SECRET_KEY);
         if(!decode){
             return res.send({success: false, message: "Invalid token!"});
         }
