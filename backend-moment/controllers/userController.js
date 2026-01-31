@@ -1,6 +1,8 @@
 import { User } from "../model/user.model.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import getDataUri from "../config/dataURI.js";
+import cloudinary from "../config/cloudinary.js";
 
 // controller for register
 export const register = async (req, res) => {
@@ -8,14 +10,14 @@ export const register = async (req, res) => {
         const { username, email, password } = req.body;
         if (!username || !email || !password) {
             return res.status(401).json({
-                message: 'Please fill all details...',
+                message: '❌Please fill all details...',
                 success: false
             });
         }
         const user = await User.findOne({ email });
         if (user) {
             return res.status(401).json({
-                message: 'Try differnt email...',
+                message: '❌Try differnt email...',
                 success: false
             });
         }
@@ -27,7 +29,7 @@ export const register = async (req, res) => {
             password: hashedPassword
         })
         return res.status(201).json({
-            message: "Account created successfully...",
+            message: "😊Account created successfully...",
             status: true
         });
     } catch (error) {
@@ -41,14 +43,14 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(401).json({
-                message: 'Please fill all details...',
+                message: '❌Please fill all details...',
                 success: false
             });
         }
         let user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({
-                message: 'Invalid details...',
+                message: '❌Invalid details...',
                 success: false
             });
         }
@@ -56,7 +58,7 @@ export const login = async (req, res) => {
         const isPassword = await bcrypt.compare(password, user.password);
         if (!isPassword) {
             return res.status(401).json({
-                message: 'Invalid password...',
+                message: '❌Invalid password...',
                 success: false
             });
         }
@@ -74,7 +76,7 @@ export const login = async (req, res) => {
         const token = await jwt.sign({ userId: user._id }, process.env.SECRET_KET, { expiresIn: '1d' });
 
         return res.cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
-            message: `Welcome back ${user.username}`,
+            message: `😊Welcome back ${user.username}`,
             success: true,
             user
         });
@@ -88,7 +90,7 @@ export const login = async (req, res) => {
 export const logout = async (_, res) => {
     try {
         return res.cookie('token', "", { maxAge: 0 }).json({
-            message: "Logged out successfully...",
+            message: "😊Logged out successfully...",
             success: true
         })
     } catch (error) {
@@ -120,11 +122,41 @@ export const editProfile = async (req, res) => {
         let cloudResponse;
 
         if(profilePicture){
-            
+            const fileUri = getDataUri(profilePicture);
+            cloudResponse = await cloudinary.uploader.upload(fileUri);
         }
+
+        const user = await User.findById({userId});
+        if(!user){
+            return res.status(401).json({
+                message: '❌User not found...',
+                success: false
+            });
+        }
+
+        if(bio) urer.bio = bio;
+        if(gender) user.gender = gender;
+        if(profilePicture) user.profilePicture = cloudResponse.secure_url;
+
+        await user.save();
+
+        return res.status(201).json({
+            message: "😊Profile Updated...",
+            status: true
+        });
 
     } catch (error) {
         console.log('editProfile Error', error);
+    }
+}
+
+// function to get suggested user
+export const getSuggestedUser = async(req, res) => {
+    try {
+        const suggestedUser = await User.find({_id:{$ne:req.id}}).select("-passsword");  // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
+        
+    } catch (error) {
+        console.log('getSuggestedUser Error', error);
     }
 }
 
