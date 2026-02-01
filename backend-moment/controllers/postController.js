@@ -72,12 +72,91 @@ export const getAllPost = async(req, res) => {
             success: true,
             post
         });
-         
-
 
     } catch (error) {
         console.log('getAllPost Error', error);
     }
 };
 
+// get number of posts you made
+export const getUserPost = async(req, res) => { // find({author: authorId}) only get posts you made
+    try {
+        const authorId = req.id;
+        const posts = await Post.find({author: authorId}).sort({createdAt:-1}).populate({   // in posts get author name and details, as who made comment
+            path:'author',  // option-> commnets
+            sort:{createdAt:-1},
+            populate:{   // get name and psaaword of user who made comments
+                path:'author',
+                select: 'username, profilePicture'
+            }
+        });
+        return res.status(200).json({
+            success: true,
+            posts
+        });
+        
+    } catch (error) {
+        console.log('getUserPost Error', error);
+    }
+};
+
+// to like  posts
+export const likePost = async(req, res) => {
+    try {
+        const likeKarneWalaUser = req.id;
+        const postId = req.params.id;
+        const post = await Post.findById(postId);
+
+        if(!post){
+            return res.status(401).json({
+                message: "😥Sorry Post not found...",
+                status: false
+            });
+        }
+
+        // like logic. ==  $addToSet -> by this you can store unique value, not duplicated, only once value is stored
+        await post.updateOne({$addToSet: {likes: likeKarneWalaUser} }); // it means in 'likes' of post go and update the likes and give id who liked the post.
+        await post.save();
+
+        // implement socket io for real time notification
+
+
+        return res.status(200).json({
+            success: true,
+            message: '😊 Post Liked...',
+        });
+
+    } catch (error) {
+        console.log('likePost Error', error);
+    }
+}
+
+// dislike post
+export const dislikePost = async(req, res) => {
+    try {
+        const dislikeKarneWalaUser = req.id;
+        const postId = req.params.id;
+        const post = await Post.findById(postId);
+
+        if(!post){
+            return res.status(401).json({
+                message: "😥Sorry Post not found...",
+                status: false
+            });
+        }
+
+        // dislike logic. ==  $pull -> by this you can remove value or pull it
+        await post.updateOne({$pull: {likes: dislikeKarneWalaUser} }); 
+        await post.save();
+
+        return res.status(200).json({
+            success: true,
+            message: '😥Post disliked...',
+        });
+
+
+    } catch (error) {
+        console.log('dislikePost Error', error);
+    }
+}
 

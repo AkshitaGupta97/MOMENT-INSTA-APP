@@ -11,7 +11,7 @@ const isAuthenticated = async (req, res, next) => {
             return res.send({success: false, message: "Invalid token!"});
         }
         
-        req.id = decode.userId; // decode.userId => it comes from token we were saved in userController [jwt.sign({userId: user._id},)]
+        req.id = decode.userId; // decode.userId => it comes from token we were saved in userController [jwt.sign({userId: user._id},)] in login
 
         next();
     } catch (error) {
