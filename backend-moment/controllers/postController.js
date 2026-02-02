@@ -154,9 +154,29 @@ export const dislikePost = async(req, res) => {
             message: '😥Post disliked...',
         });
 
-
     } catch (error) {
         console.log('dislikePost Error', error);
+    }
+};
+
+// function to add commnets on post
+export const addCommnet = async(req, res) => {
+    try {
+        const postId = req.params.id;
+        const personWhoMadeComment = req.id;
+
+        const {textMsg} = req.body;
+        const post = await Post.findById(postId);
+        if(!textMsg){
+            return res.status(200).json({
+                success: true,
+                message: '❌Text is required...',
+            });
+
+        }
+
+    } catch (error) {
+        console.log('addCommnet Error', error);
     }
 }
 
