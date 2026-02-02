@@ -2,6 +2,7 @@ import sharp from 'sharp';
 import cloudinary from '../config/cloudinary.js';
 import { Post } from '../model/post.model.js';
 import { User } from '../model/user.model.js';
+import { Commnet } from '../model/commnet.model.js';
 
 export const addNewPost = async (req, res) => {
     try {
@@ -103,19 +104,19 @@ export const getUserPost = async(req, res) => { // find({author: authorId}) only
 // to like  posts
 export const likePost = async(req, res) => {
     try {
-        const likeKarneWalaUser = req.id;
+        const userWhoLikeThePost = req.id;
         const postId = req.params.id;
         const post = await Post.findById(postId);
 
         if(!post){
             return res.status(401).json({
                 message: "😥Sorry Post not found...",
-                status: false
+                success: false
             });
         }
 
         // like logic. ==  $addToSet -> by this you can store unique value, not duplicated, only once value is stored
-        await post.updateOne({$addToSet: {likes: likeKarneWalaUser} }); // it means in 'likes' of post go and update the likes and give id who liked the post.
+        await post.updateOne({$addToSet: {likes: userWhoLikeThePost} }); // it means in 'likes' of post go and update the likes and give id who liked the post.
         await post.save();
 
         // implement socket io for real time notification
@@ -134,19 +135,19 @@ export const likePost = async(req, res) => {
 // dislike post
 export const dislikePost = async(req, res) => {
     try {
-        const dislikeKarneWalaUser = req.id;
+        const userWhoDislikeThePost = req.id;
         const postId = req.params.id;
         const post = await Post.findById(postId);
 
         if(!post){
             return res.status(401).json({
                 message: "😥Sorry Post not found...",
-                status: false
+                success: false
             });
         }
 
         // dislike logic. ==  $pull -> by this you can remove value or pull it
-        await post.updateOne({$pull: {likes: dislikeKarneWalaUser} }); 
+        await post.updateOne({$pull: {likes: userWhoDislikeThePost} }); 
         await post.save();
 
         return res.status(200).json({
@@ -168,15 +169,125 @@ export const addCommnet = async(req, res) => {
         const {textMsg} = req.body;
         const post = await Post.findById(postId);
         if(!textMsg){
-            return res.status(200).json({
-                success: true,
+            return res.status(400).json({
+                success: false,
                 message: '❌Text is required...',
             });
-
         }
+
+        const comment = await Commnet.create({
+            text: textMsg,
+            author: personWhoMadeComment,
+            post: postId
+        });
+        comment.populate({
+            path: 'author',
+            select: 'username, profilePicture',
+        });
+        // push comment to post model
+        post.comments.push(comment._id);  // push comment id in post comments
+        await post.save();
+
+        return res.status(200).json({
+            success: true,
+            message: '😊 Comment added...',
+            comment
+        });
 
     } catch (error) {
         console.log('addCommnet Error', error);
     }
+};
+
+// logic for each post with different commnets -> get comments of each post
+export const getCommentsOfPost = async(req, res) => {
+    try {
+        const {postId} = req.params.id;
+        const comments = await Comment.find({post: postId}).populate('author', 'username, profilePofilePicture');
+        if(!comments){
+            return res.status(400).json({
+                success: false,
+                message: '❌Sorry! No comments found in this post...',
+            });
+        }
+        
+        return res.status(200).json({success:true, comments});
+        
+    } catch (error) {
+        console.log('getCommentsOfPost Error', error);
+    }
 }
+
+// to delete the post
+export const deletePost = async(req, res) => {
+    try {
+        const postId = req.params.id;
+        const authorId = req.id;
+        const post = await Post.findById(postId);
+        if(!post){
+            return res.status(404).json({
+                success: false,
+                message: '❌Sorry! Post not found...',
+            });
+        }
+        // check if logged-in user is owner of post
+        if(post.author.toString() !== authorId){
+            return res.status(403).json({
+                success: false,
+                message: '❌Unauthorized user...',
+            });
+        }
+        // delete the post
+        await Post.findByIdAndDelete(postId);
+        // delete the post from Post, so that it would not be accessed -> remove postId from user
+        let user = await User.findById(authorId);
+        user.posts.filter(id => id.toString() !== postId); // it means gve all the post except this post
+        await user.save();
+
+        // after deleting the post, delete all the comments also
+        await Comment.deleteMany({post: postId});
+
+        return res.status(200).json({
+            success: true,
+            message: '😥Post deleted...',
+        });
+
+    } catch (error) {
+        console.log('deletePost Error', error);
+    }
+}
+
+// how to saveor do bookmark to post
+export const bookMarkPost = async(req, res) => {
+    try {
+        const postId = req.params.id;
+        const authorId = req.id;
+        const post = await Post.findById(postId);
+        const user = await User.findById(authorId);
+        
+        if(!post){
+            return res.status(403).json({
+                success: false,
+                message: '❌Post not found...',
+            });
+        }
+
+        // if user is already saved the post just do unsave
+        if(user.bookmarks.includes(post._id)){
+            await user.updateOne({$pull: {bookmarks:post._id}});  // {$pull: {bookmarks:post._id} it means pull the post._id from bookmarks of user.
+            await user.save();
+            return res.status(200).json({type:"unsaved", message:"😊Unsaved the post", success:true});
+        }
+        // if user didnot saved the post just do save
+        else {
+            await user.updateOne({$addToSet: {bookmarks: post._id}}); // {$addToSet: {bookmarks: post._id} it means add unique to post, means if once post is clicked it is saved and next time unsave it
+            await user.save();
+            return res.status(200).json({type:"saved", message:"😊saved the post", success: true});
+        }
+    } catch (error) {
+        console.log('bookMarkPost Error', error);
+    }
+}
+
+
 
