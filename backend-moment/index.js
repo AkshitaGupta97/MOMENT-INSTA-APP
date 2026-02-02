@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import dotenv from 'dotenv';
 import userRoute from './routes/userRoutes.js';
+import postRouter from './routes/postRoute.js';
+import messageRouter from './routes/messageRoute.js';
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use(cors({
 // routes
 app.get('/', (req, res) => res.send('Server is Live!'));
 app.use('/api/v1/user', userRoute);
+app.use('/api/v1/post', postRouter);
+app.use('/api/v1/message', messageRouter);
 
 // start server
 await connectDB();
