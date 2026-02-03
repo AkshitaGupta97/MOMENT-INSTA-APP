@@ -19,13 +19,13 @@ export const addNewPost = async (req, res) => {
 
         // image upload => we are using "Sharp" which helps to optimize image quality
         const optimizeImageBuffer = await sharp(image.buffer)
-        .resize({ width: 800, height: 800, fit: inside })
+        .resize({ width: 800, height: 800, fit: 'inside' })
         .toFormat('jpeg', { quality: 80} )
         .toBuffer();
-        console.log('check addnewPost-> optimizeImage', optimizeImageBuffer);
+       // console.log('check addnewPost-> optimizeImage', optimizeImageBuffer);
         
         const fileUri = `data:image/jpeg;base64,${optimizeImageBuffer.toString('base64')}`; // optimized image in converted into uri
-        console.log('check addnewPost-> fileUri', fileUri);
+       // console.log('check addnewPost-> fileUri', fileUri);
         const cloudResponse = await cloudinary.uploader.upload(fileUri);
 
         const post = await Post.create({
@@ -83,14 +83,24 @@ export const getAllPost = async(req, res) => {
 export const getUserPost = async(req, res) => { // find({author: authorId}) only get posts you made
     try {
         const authorId = req.id;
-        const posts = await Post.find({author: authorId}).sort({createdAt:-1}).populate({   // in posts get author name and details, as who made comment
+        /*const posts = await Post.find({author: authorId}).sort({createdAt:-1}).populate({   // in posts get author name and details, as who made comment
             path:'author',  // option-> commnets
             sort:{createdAt:-1},
-            populate:{   // get name and psaaword of user who made comments
+            populate:{   // get name and password of user who made comments
                 path:'author',
                 select: 'username, profilePicture'
             }
-        });
+        });*/
+        const posts = await Post.find({author: authorId}).sort({createdAt:-1})
+            .populate({path:'author', select:'username, profilePicture' }) // by using 'populate' we get 'username, profilePicture' of post, and comments in the each post;
+            .populate({   // in comments get author name and details, as who made comment
+                path:'comments',
+                populate:{
+                    path:'author',
+                    select: 'username, profilePicture'
+                }
+            });
+
         return res.status(200).json({
             success: true,
             posts
@@ -180,7 +190,7 @@ export const addCommnet = async(req, res) => {
             author: personWhoMadeComment,
             post: postId
         });
-        comment.populate({
+        await comment.populate({
             path: 'author',
             select: 'username, profilePicture',
         });
@@ -202,9 +212,9 @@ export const addCommnet = async(req, res) => {
 // logic for each post with different commnets -> get comments of each post
 export const getCommentsOfPost = async(req, res) => {
     try {
-        const {postId} = req.params.id;
-        const comments = await Comment.find({post: postId}).populate('author', 'username, profilePofilePicture');
-        if(!comments){
+        const postId = req.params.id;
+        const comments = await Commnet.find({post: postId}).populate('author', 'username, profilePicture').sort({createdAt: -1});
+        if(comments.length === 0){
             return res.status(400).json({
                 success: false,
                 message: '❌Sorry! No comments found in this post...',
@@ -241,11 +251,11 @@ export const deletePost = async(req, res) => {
         await Post.findByIdAndDelete(postId);
         // delete the post from Post, so that it would not be accessed -> remove postId from user
         let user = await User.findById(authorId);
-        user.posts.filter(id => id.toString() !== postId); // it means gve all the post except this post
+        user.posts = user.posts.filter(id => id.toString() !== postId); // it means give all the post except this post
         await user.save();
 
         // after deleting the post, delete all the comments also
-        await Comment.deleteMany({post: postId});
+        await Commnet.deleteMany({post: postId});
 
         return res.status(200).json({
             success: true,
