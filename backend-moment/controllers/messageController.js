@@ -13,7 +13,7 @@ export const sendMessage = async(req, res) => {
             participants:{$all : [senderId, receiverId] },   // $all means every data is present
         });
         // estalblish the conversation if not started
-        if(conversation.length === 0){
+        if(!conversation){
             conversation = await Conversation.create({
                 participants: [senderId, receiverId]
             })
