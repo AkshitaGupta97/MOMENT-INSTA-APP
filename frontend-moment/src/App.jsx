@@ -18,7 +18,7 @@ const App = () => {
       />
 
 
-      <div className="w-full h-screen bg-gray-900">
+      <div className="w-full h-screen bg-gradient-to-r from-gray-600  to-gray-800 ">
         <Routes>
           
           <Route path="/" element={<Home />}>
