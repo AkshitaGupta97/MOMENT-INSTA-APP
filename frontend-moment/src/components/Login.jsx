@@ -2,11 +2,14 @@ import { useState } from "react";
 import Logo from "./Logo"
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const Login = () => {
 
     const { axios } = useAppContext();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [input, setInput] = useState({
         email: "",
@@ -37,6 +40,7 @@ const Login = () => {
             );
             console.log("signup respose => ", response.data);
             if(response.data.success){
+                navigate('/');
                 toast.success(response.data.message);
                 setInput({
                     email: "",
@@ -84,9 +88,17 @@ const Login = () => {
                         placeholder="Enter your password"
                     />
                 </div>
-                <button type="submit" className="w-full bg-gradient-to-r from-gray-600 to-pink-600 text-white py-3 rounded-lg mt-4 hover:from-gray-700 hover:to-pink-700 transition duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    Login
-                </button>
+
+                {
+                    loading? (
+                        <Loader />
+                    ) : (
+                        <button type="submit" className="w-full bg-gradient-to-r from-gray-600 to-pink-600 text-white py-3 rounded-lg mt-4 hover:from-gray-700 hover:to-pink-700 transition duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Login
+                        </button>
+                    )
+                }
+                <p className="text-gray-600 font-semibold text-md text-center">Doesn't have an account? <Link to='/signup' className="text-pink-700">Signup</Link>  </p>
             </form>
         </div>
     )
