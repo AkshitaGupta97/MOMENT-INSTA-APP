@@ -1,6 +1,10 @@
+import { Route, Routes } from "react-router-dom";
 import SignUp from "./components/SignUp"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Login from "./components/Login";
+import Home from "./pages/Home";
+import Profile from "./components/Profile";
 
 const App = () => {
   return (
@@ -15,7 +19,16 @@ const App = () => {
 
 
       <div className="w-full h-screen bg-gray-900">
-        <SignUp />
+        <Routes>
+          
+          <Route path="/" element={<Home />}>
+            <Route path="profile" element={<Profile />} />
+          </Route>
+
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/login" element={<Login />} />
+
+        </Routes>
       </div>
     </>
 
