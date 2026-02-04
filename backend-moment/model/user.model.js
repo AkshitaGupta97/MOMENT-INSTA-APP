@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
     followers: [{type:mongoose.Schema.Types.ObjectId, ref:"User"}],
     posts: [{type:mongoose.Schema.Types.ObjectId, ref:"Post"}],
     bookmarks:[{type:mongoose.Schema.Types.ObjectId, ref:"Post"}],
+    stories: [{type:mongoose.Schema.Types.ObjectId, ref:"Story"}],
 }, {timestamps: true}); // by default create time of [createdAt, updatedAt]
 
 export const User = mongoose.model('User', userSchema);

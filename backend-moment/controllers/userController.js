@@ -134,6 +134,19 @@ export const getProfile = async (req, res) => {
     }
 }
 
+export const getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.id;
+        let user = await User.findById(userId).select('-password');
+        return res.status(200).json({
+            user,
+            success: true
+        });
+    } catch (error) {
+        console.log('getCurrentUser Error', error);
+    }
+}
+
 // controller editProfile 
 export const editProfile = async (req, res) => {
   try {

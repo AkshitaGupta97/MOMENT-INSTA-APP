@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import userRoute from './routes/userRoutes.js';
 import postRouter from './routes/postRoute.js';
 import messageRouter from './routes/messageRoute.js';
+import storyRouter from './routes/storyRoute.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.get('/', (req, res) => res.send('Server is Live!'));
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/post', postRouter);
 app.use('/api/v1/message', messageRouter);
+app.use('/api/v1/story', storyRouter);
 
 // start server
 await connectDB();
