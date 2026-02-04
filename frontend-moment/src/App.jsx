@@ -9,8 +9,10 @@ const App = () => {
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        theme="dark"   // easiest dark style
+        theme="dark"
+        style={{ zIndex: 9999 }}
       />
+
 
       <div className="w-full h-screen bg-gray-900">
         <SignUp />

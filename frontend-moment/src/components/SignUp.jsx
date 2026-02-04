@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 const SignUp = () => {
 
     const { axios } = useAppContext();
+    const [loading, setLoading] = useState(false);
 
     const [input, setInput] = useState({
         username: "",
@@ -24,6 +25,7 @@ const SignUp = () => {
         e.preventDefault();
         try {
             // console.log("signUpHandler -> Signup page -> ", input);
+            setLoading(true);
 
             const response = await axios.post(
                 "/api/v1/user/register",
@@ -34,13 +36,22 @@ const SignUp = () => {
                     },
                 }
             );
+            console.log("signup respose => ", response.data);
             if(response.data.success){
                 toast.success(response.data.message);
+                setInput({
+                    username: "",
+                    email: "",
+                    password: ""
+                })
             }
 
         } catch (error) {
             console.log("signUpHandler -> Signup page -> ", error);
             toast.error(error.response.data.message);
+        }
+        finally{
+            setLoading(false);
         }
     }
 
