@@ -2,12 +2,14 @@ import { useState } from "react";
 import Logo from "./Logo"
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const SignUp = () => {
 
     const { axios } = useAppContext();
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [input, setInput] = useState({
         username: "",
@@ -39,6 +41,7 @@ const SignUp = () => {
             );
             console.log("signup respose => ", response.data);
             if(response.data.success){
+                navigate('/');
                 toast.success(response.data.message);
                 setInput({
                     username: "",
@@ -98,10 +101,17 @@ const SignUp = () => {
                         placeholder="Enter your password"
                     />
                 </div>
-                <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg mt-4 hover:from-blue-700 hover:to-purple-700 transition duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    Sign Up
-                </button>
                 
+                {
+                    loading? (
+                        <Loader />
+                    ) : (
+                        <button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg mt-4 hover:from-blue-700 hover:to-purple-700 transition duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Sign Up
+                        </button>
+                    )
+                }
+
                 <p className="text-gray-600 font-semibold text-md text-center">Already have an account? <Link to='/login' className="text-blue-700">Login</Link>  </p>
             </form>
         </div>
