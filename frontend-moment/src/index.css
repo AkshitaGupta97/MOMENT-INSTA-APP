@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: #dcd7d7;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+}
+a {
+  text-decoration: none;
+}
+button {
+  font-family: 'Poppins', sans-serif;
+}
+input, textarea {
+  font-family: 'Open Sans', sans-serif;
+}
+input::placeholder {
+  color: #6e6a6a;
+}
+label {
+  font-weight: bold;
+  font-size: medium;
+}
