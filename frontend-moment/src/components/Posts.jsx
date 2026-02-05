@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Bookmark, Heart, MessageCircle, Send, Trash2 } from "lucide-react";
+import CommentDialog from "./CommentDialog";
 
 export const Posts = () => {
     const [isFollowing, setIsFollowing] = useState(false);
@@ -35,20 +36,20 @@ export const Posts = () => {
     }
 
     return (
-        <div className="my-8 w-[70%] max-w-sm p-2 mx-auto bg-gray-600 rounded-lg">
-            <div className="flex items-center justify-between p-3">
+        <div className="my-2 w-[70%] max-w-sm p-1 mx-auto bg-gray-600 rounded-lg">
+            <div className="flex items-center justify-between p-1">
                 <div className="flex items-center gap-2">
                     <img
                         className="w-8 h-8 rounded-full"
                         src="https://img.freepik.com/premium-photo/love-bird-logo-design-template-abstract-love-bird-logo-design-concept_1308172-107908.jpg"
                         alt=""
                     />
-                    <h1>username</h1>
+                    <h1 className="text-amber-200 font-semibold">username</h1>
                 </div>
 
                 <div className="relative" ref={menuRef}>
                     <button
-                        className="p-2 rounded-full hover:bg-pink-400"
+                        className="p-2 rounded-full hover:bg-gray-500"
                         onClick={() => setMenuOpen((s) => !s)}
                         aria-label="menu"
                     >
@@ -56,37 +57,38 @@ export const Posts = () => {
                     </button>
 
                     {menuOpen && (
-                        <div className="absolute right-0 mt-2 w-44 bg-pink-400 shadow-md rounded">
+                        <div className="absolute right-0 mt-2 w-44 bg-gray-400 shadow-md rounded">
                             <button
-                                className="w-full text-left px-4 py-2 hover:bg-pink-600 flex items-center gap-2"
+                                className="w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
                                 onClick={toggleFollow}
                             >
-                                <span>{isFollowing ? "Unfollow" : "Follow"}</span>
+                                <Heart className={isFollowing ? "text-red-500 fill-pink-600" : "text-gray-700"} size={18} />
+                                <span className="font-semibold text-white">{isFollowing ? "Unfollow" : "Follow"}</span>
                             </button>
 
                             <button
-                                className="w-full text-left px-4 py-2 hover:bg-pink-600 flex items-center gap-2 text-red-600"
+                                className="border-t border-gray-100 w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
                                 onClick={handleDelete}
                             >
-                                <Trash2 size={16} />
-                                <span>Delete</span>
+                                <Trash2 className="text-pink-600" size={18} />
+                                <span className="font-semibold text-white">Delete</span>
                             </button>
                         </div>
                     )}
                 </div>
             </div>
 
-            <div className="p-3">
+            <div className="p-1">
                 <p>{isFollowing ? "You are following this user." : "You are not following this user."}</p>
             </div>
 
             <div className="rounded-lg shadow-md">
-                <img className="rounded-md my-3 w-full aspect-square object-cover"
+                <img className="rounded-md my-1 w-full aspect-square object-cover"
                     src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
                 />
             </div>
 
-            <div className="flex flex-col p-3 gap-2">
+            <div className="flex flex-col p-1 gap-1">
 
                 <div className="flex justify-between items-center">
                     <div className="flex  items-center gap-4">
@@ -95,15 +97,26 @@ export const Posts = () => {
                         <Send size={'22px'} className="cursor-pointer text-white hover:text-green-400 transition" />
                     </div>
                     <div>
-                        <Bookmark size={'22px'} className="cursor-pointer text-white hover:text-yellow-400 transition" />
+                        <Bookmark size={'22px'} className="cursor-pointer text-white fill-amber-200 hover:text-yellow-400 transition" />
                     </div>
                 </div>
 
                 <span className="text-white font-semibold text-sm">1k Likes</span>
                 <div className=" flex flex-col text-white font-semibold">
                     <p >username</p>
-                    <p className="font-thin">caption - This is a sample post description.</p>
+                    <p className="text-sm">caption - This is a sample post description.</p>
                 </div>
+
+                <p className="font-semibold text-sm text-amber-200">View all comments...</p>
+                <CommentDialog />
+                
+                <div className="relative">
+                    <input className="shadow-md outline-none text-xs w-full bg-slate-500 placeholder:font-semibold placeholder:text-amber-200 rounded-md py-2 px-3"
+                        type="text" placeholder="add a comment..." 
+                    />
+                    <Send size={'22px'} className="absolute right-4 top-1 cursor-pointer text-white hover:text-amber-200 transition" />
+                </div>
+
             </div>
 
         </div>
