@@ -1,144 +1,111 @@
-import { useEffect, useState } from "react";
-import { useAppContext } from "../context/AppContext";
-import { toast } from "react-toastify";
-import Loader from "./Loader";
-import { Heart, MessageCircle, Send, Bookmark } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Bookmark, Heart, MessageCircle, Send, Trash2 } from "lucide-react";
 
-const Posts = () => {
-  const { axios } = useAppContext();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+export const Posts = () => {
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [deleted, setDeleted] = useState(false);
+    const menuRef = useRef(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch current user
-        const userResponse = await axios.get('/api/v1/user/me');
-        if (userResponse.data.success) {
-          setCurrentUser(userResponse.data.user);
-        }
+    useEffect(() => {   //Click ⋯ → menu opens,  Click outside → menu closes
 
-        // Fetch posts
-        const postsResponse = await axios.get('/api/v1/post/all');
-        if (postsResponse.data.success) {
-          setPosts(postsResponse.data.post);
-        }
-      } catch (error) {
-        console.log("Error fetching data:", error);
-        toast.error("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
+        const handleClickOutside = (e) => {
+            if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);   // If menu exists , AND click is NOT inside menu
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const toggleFollow = () => {
+        setIsFollowing((p) => !p);
+        setMenuOpen(false);
     };
 
-    fetchData();
-  }, [axios]);
+    const handleDelete = () => {
+        setDeleted(true);
+        setMenuOpen(false);
+    };
 
-  const handleFollowUnfollow = async (userId) => {
-    try {
-      const response = await axios.post(`/api/v1/user/followunfollow/${userId}`);
-      if (response.data.success || response.data.status) {
-        toast.success(response.data.message);
-        // Update current user's following list
-        if (currentUser) {
-          const isFollowing = currentUser.following.includes(userId);
-          const updatedFollowing = isFollowing
-            ? currentUser.following.filter(id => id !== userId)
-            : [...currentUser.following, userId];
-          setCurrentUser({ ...currentUser, following: updatedFollowing });
-        }
-      }
-    } catch (error) {
-      console.log("Error following/unfollowing:", error);
-      toast.error("Failed to follow/unfollow");
+    if (deleted) {
+        return (
+            <div className="my-8 w-[70%] max-w-sm mx-auto bg-pink-400 rounded-lg p-4 text-gray-200">
+                Post removed
+            </div>
+        );
     }
-  };
 
-  if (loading) {
-    return <Loader />;
-  }
-
-  return (
-    <div className="w-full max-w-2xl mx-auto px-4">
-      {posts.length === 0 ? (
-        <div className="text-white text-center">No posts yet...</div>
-      ) : (
-        posts.map((post) => (
-          <div key={post._id} className="bg-white bg-opacity-10 backdrop-blur-md rounded-lg mb-6 shadow-lg overflow-hidden">
-            {/* Post Header */}
-            <div className="flex items-center justify-between p-4">
-              <div className="flex items-center">
-                <img
-                  src={post.author?.profilePicture || "/default-avatar.png"}
-                  alt={post.author?.username}
-                  className="w-8 h-8 rounded-full mr-3"
-                />
-                <span className="text-white font-semibold text-sm">{post.author?.username}</span>
-              </div>
-              {post.author?._id !== currentUser?._id && (
-                <button
-                  onClick={() => handleFollowUnfollow(post.author._id)}
-                  className={`px-4 py-1 rounded-full text-xs font-semibold ${
-                    currentUser?.following?.includes(post.author._id)
-                      ? 'bg-gray-600 text-white hover:bg-gray-700'
-                      : 'bg-blue-500 text-white hover:bg-blue-600'
-                  } transition-colors`}
-                >
-                  {currentUser?.following?.includes(post.author._id) ? 'Following' : 'Follow'}
-                </button>
-              )}
-            </div>
-
-            {/* Post Image */}
-            <img
-              src={post.image}
-              alt="Post"
-              className="w-full aspect-square object-cover"
-            />
-
-            {/* Post Actions */}
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-4">
-                  <Heart className="w-6 h-6 text-white cursor-pointer hover:text-red-500 transition-colors" />
-                  <MessageCircle className="w-6 h-6 text-white cursor-pointer hover:text-blue-500 transition-colors" />
-                  <Send className="w-6 h-6 text-white cursor-pointer hover:text-green-500 transition-colors" />
+    return (
+        <div className="my-8 w-[70%] max-w-sm p-2 mx-auto bg-gray-600 rounded-lg">
+            <div className="flex items-center justify-between p-3">
+                <div className="flex items-center gap-2">
+                    <img
+                        className="w-8 h-8 rounded-full"
+                        src="https://img.freepik.com/premium-photo/love-bird-logo-design-template-abstract-love-bird-logo-design-concept_1308172-107908.jpg"
+                        alt=""
+                    />
+                    <h1>username</h1>
                 </div>
-                <Bookmark className="w-6 h-6 text-white cursor-pointer hover:text-yellow-500 fill-current transition-colors" />
-              </div>
 
-              {/* Likes count (placeholder) */}
-              <div className="text-white font-semibold text-sm mb-2">
-                {Math.floor(Math.random() * 1000) + 1} likes
-              </div>
+                <div className="relative" ref={menuRef}>
+                    <button
+                        className="p-2 rounded-full hover:bg-pink-400"
+                        onClick={() => setMenuOpen((s) => !s)}
+                        aria-label="menu"
+                    >
+                        <span className="text-2xl">⋯</span>
+                    </button>
 
-              {/* Caption */}
-              <div className="text-white text-sm mb-2">
-                <span className="font-semibold mr-2">{post.author?.username}</span>
-                {post.caption}
-              </div>
+                    {menuOpen && (
+                        <div className="absolute right-0 mt-2 w-44 bg-pink-400 shadow-md rounded">
+                            <button
+                                className="w-full text-left px-4 py-2 hover:bg-pink-600 flex items-center gap-2"
+                                onClick={toggleFollow}
+                            >
+                                <span>{isFollowing ? "Unfollow" : "Follow"}</span>
+                            </button>
 
-              {/* Comments count */}
-              <div className="text-gray-400 text-sm cursor-pointer hover:text-gray-300">
-                View all {post.comments?.length || 0} comments
-              </div>
-
-              {/* Add comment input (placeholder) */}
-              <div className="flex items-center mt-3 border-t border-gray-600 pt-3">
-                <input
-                  type="text"
-                  placeholder="Add a comment..."
-                  className="flex-1 bg-transparent text-white text-sm outline-none"
-                />
-                <button className="text-blue-500 text-sm font-semibold ml-2">Post</button>
-              </div>
+                            <button
+                                className="w-full text-left px-4 py-2 hover:bg-pink-600 flex items-center gap-2 text-red-600"
+                                onClick={handleDelete}
+                            >
+                                <Trash2 size={16} />
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-};
 
-export default Posts;
+            <div className="p-3">
+                <p>{isFollowing ? "You are following this user." : "You are not following this user."}</p>
+            </div>
+
+            <div className="rounded-lg shadow-md">
+                <img className="rounded-md my-3 w-full aspect-square object-cover"
+                    src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
+                />
+            </div>
+
+            <div className="flex flex-col p-3 gap-2">
+
+                <div className="flex justify-between items-center">
+                    <div className="flex  items-center gap-4">
+                        <Heart size={'22px'} className="cursor-pointer text-white fill-pink-500 hover:text-pink-400 transition" />
+                        <MessageCircle size={'22px'} className="cursor-pointer text-white hover:text-cyan-400 transition" />
+                        <Send size={'22px'} className="cursor-pointer text-white hover:text-green-400 transition" />
+                    </div>
+                    <div>
+                        <Bookmark size={'22px'} className="cursor-pointer text-white hover:text-yellow-400 transition" />
+                    </div>
+                </div>
+
+                <span className="text-white font-semibold text-sm">1k Likes</span>
+                <div className=" flex flex-col text-white font-semibold">
+                    <p >username</p>
+                    <p className="font-thin">caption - This is a sample post description.</p>
+                </div>
+            </div>
+
+        </div>
+    );
+};

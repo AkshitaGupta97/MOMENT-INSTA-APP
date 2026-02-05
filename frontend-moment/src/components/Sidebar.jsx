@@ -83,7 +83,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-6 right-2 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="bg-gray-700 text-white p-2 rounded-lg shadow-lg"
