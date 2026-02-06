@@ -1,7 +1,11 @@
 
-const CommentDialog = () => {
+const CommentDialog = ({open, setOpen}) => {
   return (
-    <div>CommentDialog</div>
+    <div open={open} className="bg-blue-400">
+        <div>
+            kjsndjc
+        </div>
+    </div>
   )
 }
 

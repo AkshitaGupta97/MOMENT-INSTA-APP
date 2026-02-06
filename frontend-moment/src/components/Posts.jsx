@@ -8,6 +8,21 @@ export const Posts = () => {
     const [deleted, setDeleted] = useState(false);
     const menuRef = useRef(null);
 
+    const [text, setText] = useState('');
+    const [open, setOpen] = useState(false);
+
+    const changeEventHandler = (e) => {
+        // remove extra space
+        const inputText = e.target.value;
+        if(inputText.trim()){  // if we are removing white space then we add it to setText
+            setText(inputText);
+        }
+        else {
+            setText('');
+        }
+
+    }
+
     useEffect(() => {   //Click ⋯ → menu opens,  Click outside → menu closes
 
         const handleClickOutside = (e) => {
@@ -70,7 +85,7 @@ export const Posts = () => {
                                 className="border-t border-gray-100 w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
                                 onClick={handleDelete}
                             >
-                                <Trash2 className="text-pink-600" size={18} />
+                                <Trash2 className="text-pink-500" size={18} />
                                 <span className="font-semibold text-white">Delete</span>
                             </button>
                         </div>
@@ -83,7 +98,7 @@ export const Posts = () => {
             </div>
 
             <div className="rounded-lg shadow-md">
-                <img className="rounded-md my-1 w-full aspect-square object-cover"
+                <img className="rounded-lg my-1 w-full h-60 aspect-square object-cover"
                     src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
                 />
             </div>
@@ -93,7 +108,9 @@ export const Posts = () => {
                 <div className="flex justify-between items-center">
                     <div className="flex  items-center gap-4">
                         <Heart size={'22px'} className="cursor-pointer text-white fill-pink-500 hover:text-pink-400 transition" />
-                        <MessageCircle size={'22px'} className="cursor-pointer text-white hover:text-cyan-400 transition" />
+                        <MessageCircle onClick={() => setOpen(true)}
+                            size={'22px'} className="cursor-pointer text-white hover:text-cyan-400 transition" 
+                        />
                         <Send size={'22px'} className="cursor-pointer text-white hover:text-green-400 transition" />
                     </div>
                     <div>
@@ -107,15 +124,24 @@ export const Posts = () => {
                     <p className="text-sm">caption - This is a sample post description.</p>
                 </div>
 
-                <p className="font-semibold text-sm text-amber-200">View all comments...</p>
-                <CommentDialog />
-                
-                <div className="relative">
-                    <input className="shadow-md outline-none text-xs w-full bg-slate-500 placeholder:font-semibold placeholder:text-amber-200 rounded-md py-2 px-3"
-                        type="text" placeholder="add a comment..." 
-                    />
-                    <Send size={'22px'} className="absolute right-4 top-1 cursor-pointer text-white hover:text-amber-200 transition" />
-                </div>
+                {
+                    open && (
+                        <>
+                            <p onClick={() => setOpen(false)} className="font-semibold text-sm text-amber-200">View all comments...</p>
+                            <CommentDialog open={open} setOpen={setOpen} />
+                            
+                            <div className="relative">
+                                <input  value={text} onChange={changeEventHandler}
+                                    className="shadow-md outline-none text-xs w-full bg-slate-500 placeholder:font-semibold placeholder:text-amber-200 rounded-md py-2 px-3"
+                                    type="text" placeholder="add a comment..." 
+                                />
+                                {
+                                    text && <Send onClick={() => setOpen(false)}  size={'22px'} className="absolute right-4 top-1 cursor-pointer text-white hover:text-amber-200 transition" />
+                                }
+                            </div>
+                        </>
+                    )
+                }
 
             </div>
 
