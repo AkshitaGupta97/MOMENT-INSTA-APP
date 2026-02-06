@@ -14,12 +14,17 @@ const Stories = () => {
 
   const fetchStories = async () => {
     try {
+      setLoading(true);
       const response = await axios.get('/api/v1/story/all');
+      console.log('fetchStories response:', response?.data);
       if (response.data.success) {
-        setStories(response.data.stories);
+        setStories(response.data.stories || []);
+      } else {
+        setStories([]);
       }
     } catch (error) {
-      console.log("Error fetching stories:", error);
+      console.log("Error fetching stories:", error, error.response?.data);
+      setStories([]);
     } finally {
       setLoading(false);
     }
@@ -74,7 +79,7 @@ const Stories = () => {
   };
 
   if (loading) {
-    <Loader />
+    return <Loader />
   }
 
   // Group stories by author
@@ -109,9 +114,11 @@ const Stories = () => {
           'Content-Type': 'multipart/form-data'
         }
       });
+      console.log('handleStoryUpload response:', response?.data);
       if (response.data.success) {
         toast.success('Story added successfully!');
         fetchStories(); // Refresh the stories list
+        fileInputRef.current.value = ''; // Reset file input
       }
     } catch (error) {
       console.log("Error uploading story:", error);
@@ -158,7 +165,7 @@ const Stories = () => {
                 <div className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-gray-800"></div>
               )}
             </div>
-            <span className="text-xs text-white text-center w-16 truncate">
+            <span className="text-xs font-semibold text-amber-200 text-center w-16 truncate">
               {group.author.username}
             </span>
           </div>

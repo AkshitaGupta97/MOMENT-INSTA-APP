@@ -68,8 +68,11 @@ const Sidebar = () => {
         },
       });
 
+      console.log('Sidebar handleStoryUpload response:', response?.data);
       if (response.data.success) {
         toast.success('Story added successfully!');
+        // Refresh the page to show the new story
+        window.location.reload();
       }
     } catch (error) {
       console.log("Error uploading story:", error);

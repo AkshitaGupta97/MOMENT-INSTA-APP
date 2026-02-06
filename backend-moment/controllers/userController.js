@@ -92,10 +92,13 @@ export const login = async (req, res) => {
             posts: populatedPost
         }
 
+        // Set cookie for auth token. For local development we allow cross-site
+        // requests by using sameSite: 'none'. Some browsers require Secure when
+        // sameSite is 'none' in production; we keep `secure: false` for localhost.
         res.cookie('token', token, {
             httpOnly: true,
-            sameSite: 'lax',   // 👈 use lax for dev
-            secure: false,     // true only in production HTTPS
+            sameSite: 'none',
+            secure: false,
             maxAge: 24 * 60 * 60 * 1000
         }).json({
             message: `😊Welcome back ${user.username}`,
@@ -111,7 +114,8 @@ export const login = async (req, res) => {
 // controller for logout
 export const logout = async (_, res) => {
     try {
-        return res.cookie('token', "", { maxAge: 0 }).json({
+        // Clear cookie with same attributes to ensure browser removes it
+        return res.cookie('token', "", { maxAge: 0, sameSite: 'none', secure: false }).json({
             message: "😊Logged out successfully...",
             success: true
         })

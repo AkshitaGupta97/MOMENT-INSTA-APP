@@ -68,7 +68,7 @@ export const getStories = async (req, res) => {
             author: { $in: followingIds },
             expiresAt: { $gt: new Date() }
         })
-        .populate({path: 'author', select: 'username, profilePicture'})
+        .populate({path: 'author', select: 'username profilePicture'})
         .populate({path: 'viewers', select: 'username'})
         .sort({createdAt: -1});
 

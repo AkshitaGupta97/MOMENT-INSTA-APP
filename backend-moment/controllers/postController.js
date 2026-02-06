@@ -60,13 +60,13 @@ export const getAllPost = async(req, res) => {
     try {
         // fetch post as the recent post is at top. as "stack concept" -> sort({createdAt:-1})
         const post = await Post.find().sort({createdAt:-1})
-        .populate({path:'author', select:'username, profilePicture' }) // by using 'populate' we get 'username, profilePicture' of post, and comments in the each post
+        .populate({path:'author', select:'username profilePicture' }) // by using 'populate' we get 'username profilePicture' of post, and comments in the each post
         .populate({   // in comments get author name and details, as who made comment
             path:'comments', 
             sort:{createdAt:-1},
             populate:{   // get name and psaaword of user who made comments
                 path:'author',
-                select: 'username, profilePicture'
+                select: 'username profilePicture'
             }
         });
         return res.status(200).json({
@@ -92,12 +92,12 @@ export const getUserPost = async(req, res) => { // find({author: authorId}) only
             }
         });*/
         const posts = await Post.find({author: authorId}).sort({createdAt:-1})
-            .populate({path:'author', select:'username, profilePicture' }) // by using 'populate' we get 'username, profilePicture' of post, and comments in the each post;
+            .populate({path:'author', select:'username profilePicture' }) // by using 'populate' we get 'username profilePicture' of post, and comments in the each post;
             .populate({   // in comments get author name and details, as who made comment
                 path:'comments',
                 populate:{
                     path:'author',
-                    select: 'username, profilePicture'
+                    select: 'username profilePicture'
                 }
             });
 
