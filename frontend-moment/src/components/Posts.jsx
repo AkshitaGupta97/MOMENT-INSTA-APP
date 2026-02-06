@@ -10,6 +10,7 @@ export const Posts = () => {
 
     const [text, setText] = useState('');
     const [open, setOpen] = useState(false);
+    const [openComment, setComment] = useState(false);
 
     const changeEventHandler = (e) => {
         // remove extra space
@@ -44,21 +45,22 @@ export const Posts = () => {
 
     if (deleted) {
         return (
-            <div className="my-8 w-[70%] max-w-sm mx-auto bg-pink-400 rounded-lg p-4 text-gray-200">
+            <div className="my-8 w-full max-w-md mx-auto bg-pink-400 rounded-lg p-4 text-gray-200">
                 Post removed
             </div>
         );
     }
 
     return (
-        <div className="my-2 w-[70%] max-w-sm p-1 mx-auto bg-gray-600 rounded-lg">
+        <div className="my-2  max-w-lg p-1 mx-auto bg-gray-600 rounded-lg sm:w-11/12 md:w-3/4 lg:w-2/3">
             <div className="flex items-center justify-between p-1">
                 <div className="flex items-center gap-2">
                     <img
-                        className="w-8 h-8 rounded-full"
+                        className="w-8 h-8 rounded-full cursor-pointer"
                         src="https://img.freepik.com/premium-photo/love-bird-logo-design-template-abstract-love-bird-logo-design-concept_1308172-107908.jpg"
                         alt=""
                     />
+
                     <h1 className="text-amber-200 font-semibold">username</h1>
                 </div>
 
@@ -98,9 +100,11 @@ export const Posts = () => {
             </div>
 
             <div className="rounded-lg shadow-md">
-                <img className="rounded-lg my-1 w-full h-60 aspect-square object-cover"
+                <img onClick={() => setComment(true)}
+                    className="rounded-lg my-1 mx-auto max-w-md w-full max-h-[50vh] object-cover cursor-pointer"
                     src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
                 />
+                <CommentDialog openComment={openComment} setComment={setComment} />
             </div>
 
             <div className="flex flex-col p-1 gap-1">
@@ -108,7 +112,7 @@ export const Posts = () => {
                 <div className="flex justify-between items-center">
                     <div className="flex  items-center gap-4">
                         <Heart size={'22px'} className="cursor-pointer text-white fill-pink-500 hover:text-pink-400 transition" />
-                        <MessageCircle onClick={() => setOpen(true)}
+                        <MessageCircle onClick={() => setOpen(!open)} 
                             size={'22px'} className="cursor-pointer text-white hover:text-cyan-400 transition" 
                         />
                         <Send size={'22px'} className="cursor-pointer text-white hover:text-green-400 transition" />
@@ -128,15 +132,14 @@ export const Posts = () => {
                     open && (
                         <>
                             <p onClick={() => setOpen(false)} className="font-semibold text-sm text-amber-200">View all comments...</p>
-                            <CommentDialog open={open} setOpen={setOpen} />
                             
                             <div className="relative">
                                 <input  value={text} onChange={changeEventHandler}
-                                    className="shadow-md outline-none text-xs w-full bg-slate-500 placeholder:font-semibold placeholder:text-amber-200 rounded-md py-2 px-3"
+                                    className="shadow-md outline-none text-xs w-full bg-slate-300 text-gray-800 placeholder:font-semibold placeholder:text-gray-800 rounded-md py-2 px-3"
                                     type="text" placeholder="add a comment..." 
                                 />
                                 {
-                                    text && <Send onClick={() => setOpen(false)}  size={'22px'} className="absolute right-4 top-1 cursor-pointer text-white hover:text-amber-200 transition" />
+                                    text && <Send onClick={() => setOpen(false)}  size={'22px'} className="absolute right-4 top-1 cursor-pointer text-gray-800 hover:text-amber-800 transition" />
                                 }
                             </div>
                         </>
