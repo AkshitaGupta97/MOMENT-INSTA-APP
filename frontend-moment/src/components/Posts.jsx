@@ -104,7 +104,12 @@ export const Posts = () => {
                     className="rounded-lg my-1 mx-auto max-w-md w-full max-h-[50vh] object-cover cursor-pointer"
                     src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
                 />
-                <CommentDialog openComment={openComment} setComment={setComment} />
+                <CommentDialog 
+                  openComment={openComment} 
+                  setComment={setComment}
+                  postAuthorId={null} // Replace with actual author ID when available
+                  postAuthor={null} // Replace with actual author data when available
+                />
             </div>
 
             <div className="flex flex-col p-1 gap-1">

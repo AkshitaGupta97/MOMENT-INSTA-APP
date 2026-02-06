@@ -1,24 +1,75 @@
-import { Heart, Send, X } from "lucide-react";
+import { Heart, Send, Star, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
-const CommentDialog = ({ openComment, setComment }) => {
+const CommentDialog = ({ openComment, setComment, postAuthorId, postAuthor }) => {
   if (!openComment) return null;
 
+  const { axios } = useAppContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuref = useRef(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [text, setText] = useState('');
+
+  const changeEventHandler = (e) => {
+    const inputText = e.target.value;
+    if(inputText.trim()){
+      setText(inputText);
+    }
+    else {
+      setText('');
+    }
+  }
+
+  const sendMessageHandler = async () => {
+    alert(text);
+  }
+
+  // Check if currentUser is following the post author
+  useEffect(() => {
+    if (postAuthor?.followers && postAuthor.followers.length > 0) {
+      // This would be set from parent component with current user info
+      // For now, we'll rely on the API response
+    }
+  }, [postAuthor]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuref.current && !menuref.current.contains(e.target)) setMenuOpen(false);
     }
     document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const toggleFollow = () => {
-    setMenuOpen(false);
-    setIsFollowing((p) => !p);
+  const toggleFollow = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!postAuthorId) {
+        setError("Unable to perform this action");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(`/api/v1/user/followunfollow/${postAuthorId}`);
+
+      if (response.data.success) {
+        setIsFollowing(!isFollowing);
+      } else {
+        setError(response.data.message || "Failed to update follow status");
+      }
+    } catch (err) {
+      console.error("Follow/Unfollow Error:", err);
+      setError(err.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false);
+      setMenuOpen(false);
+    }
   }
 
   return (
@@ -72,14 +123,28 @@ const CommentDialog = ({ openComment, setComment }) => {
 
               {
                 menuOpen && (
-                  <div className="absolute right-0 mt-2 w-44 bg-gray-400 shadow-md rounded">
+                  <div className="absolute top-8 flex flex-col right-0 mt-2 w-52 bg-gray-400 shadow-md rounded z-10">
                     <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       onClick={toggleFollow}
+                      disabled={loading}
                     >
                       <Heart className={isFollowing ? "text-red-500 fill-pink-600" : "text-gray-700"} size={18} />
-                      <span className="font-semibold text-white">{isFollowing ? "Unfollow" : "Follow"}</span>
+                      <span className="font-semibold text-white">
+                        {loading ? "Loading..." : isFollowing ? "Unfollow" : "Follow"}
+                      </span>                      
                     </button>
+
+                    <button className="w-full border-t border-amber-200 text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                      <Star size={18} /> 
+                      <p className="font-semibold text-white">Add to favourite... </p>
+                    </button>
+
+                    {error && (
+                      <div className="px-4 py-2 text-xs text-red-500 border-t border-gray-300">
+                        {error}
+                      </div>
+                    )}
                   </div>
                 )
               }
@@ -103,11 +168,11 @@ const CommentDialog = ({ openComment, setComment }) => {
           {/* Input Section */}
           <div className="p-3 sm:p-4 border-t border-gray-700">
             <form className="flex gap-2">
-              <input
+              <input onChange={changeEventHandler} value={text}
                 className="flex-1 bg-gray-700 placeholder-gray-400 text-xs sm:text-sm text-white rounded px-3 py-2 outline-none focus:ring-2 focus:ring-pink-500"
                 placeholder="Add a comment..."
               />
-              <button
+              <button onClick={sendMessageHandler}  disabled={!text.trim()}
                 type="button"
                 className="font-semibold flex justify-center items-center px-2 sm:px-3 py-2 rounded text-white hover:bg-gray-700 transition"
               >
@@ -122,3 +187,7 @@ const CommentDialog = ({ openComment, setComment }) => {
 };
 
 export default CommentDialog;
+
+/*
+ disabled={!text.trim()} means make it disabled when it is empty
+*/
