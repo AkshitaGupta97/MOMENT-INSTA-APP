@@ -4,11 +4,14 @@ import Logo from './Logo';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const Sidebar = () => {
   const {axios} = useAppContext();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const user = useSelector(store => store.auth); // to get value from store we use useSelector
 
   const sidebarItems = [
     { icon: <Home />, text: "Home" },
@@ -17,7 +20,7 @@ const Sidebar = () => {
     { icon: <MessageCircle />, text: "Message" },
     { icon: <Heart />, text: "Notification" },
     { icon: <PlusSquare />, text: "Create" },
-    { icon: <UserRound />, text: "Profile" },
+    { icon: user?.profilePicture ? <img src={user?.profilePicture} alt="Profile" className="w-6 h-6 rounded-full object-cover" /> : <UserRound />, text: "Profile" },
     { icon: <LogOut />, text: "Logout" },
   ]
 

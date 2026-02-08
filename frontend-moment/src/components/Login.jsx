@@ -4,12 +4,16 @@ import { useAppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../redux/authSlice";
 
 const Login = () => {
 
     const { axios } = useAppContext();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const dispatch = useDispatch(); // we use dispatch to call functions
 
     const [input, setInput] = useState({
         email: "",
@@ -40,6 +44,7 @@ const Login = () => {
             );
             console.log("signup respose => ", response.data);
             if(response.data.success){
+                dispatch(setAuthUser(response.data.user));
                 navigate('/');
                 toast.success(response.data.message);
                 setInput({
