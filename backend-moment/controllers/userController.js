@@ -72,9 +72,9 @@ export const login = async (req, res) => {
 
         // populate each post id in the post array, when user login then give their each post
         const populatedPost = await Promise.all(
-            user.posts.map(async (postId)=>{
+            user.posts.map(async (postId) => {
                 const post = await Post.findById(postId);
-                if(post.author.equals(user._id)){
+                if (post.author.equals(user._id)) {
                     return post;
                 }
                 return null;
@@ -95,16 +95,22 @@ export const login = async (req, res) => {
         // Set cookie for auth token. For local development we allow cross-site
         // requests by using sameSite: 'none'. Some browsers require Secure when
         // sameSite is 'none' in production; we keep `secure: false` for localhost.
-        res.cookie('token', token, {
+        // set cookie first
+        res.cookie("token", token, {
             httpOnly: true,
-            sameSite: 'none',
+            sameSite: "lax",
             secure: false,
-            maxAge: 24 * 60 * 60 * 1000
-        }).json({
+            path: "/",
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        // then send response
+        return res.status(200).json({
             message: `😊Welcome back ${user.username}`,
             success: true,
             user
         });
+
 
     } catch (error) {
         console.log('Login Error', error);
@@ -153,73 +159,73 @@ export const getCurrentUser = async (req, res) => {
 
 // controller editProfile 
 export const editProfile = async (req, res) => {
-  try {
-    const userId = req.id; // from isAuthenticated middleware
-    const { bio, gender } = req.body;
-    const profilePicture = req.file; // ✅ correct = images, video are file so we get it from req.file
+    try {
+        const userId = req.id; // from isAuthenticated middleware
+        const { bio, gender } = req.body;
+        const profilePicture = req.file; // ✅ correct = images, video are file so we get it from req.file
 
-    let cloudResponse;
+        let cloudResponse;
 
-    if (profilePicture) {
-      const fileUri = getDataUri(profilePicture); // expects file
-      cloudResponse = await cloudinary.uploader.upload(fileUri);
+        if (profilePicture) {
+            const fileUri = getDataUri(profilePicture); // expects file
+            cloudResponse = await cloudinary.uploader.upload(fileUri);
+        }
+
+        const user = await User.findById(userId).select('-password');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: '❌ User not found'
+            });
+        }
+
+        if (bio) user.bio = bio;
+        if (gender) user.gender = gender;
+        if (cloudResponse) user.profilePicture = cloudResponse.secure_url;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: '😊 Profile updated successfully',
+            user
+        });
+
+    } catch (error) {
+        console.error('editProfile Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
     }
-
-    const user = await User.findById(userId).select('-password');
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: '❌ User not found'
-      });
-    }
-
-    if (bio) user.bio = bio;
-    if (gender) user.gender = gender;
-    if (cloudResponse) user.profilePicture = cloudResponse.secure_url;
-
-    await user.save();
-
-    return res.status(200).json({
-      success: true,
-      message: '😊 Profile updated successfully',
-      user
-    });
-
-  } catch (error) {
-    console.error('editProfile Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
 };
 
 
 // function to get suggested user
 export const getSuggestedUser = async (req, res) => {
-  try {
-    const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select('-password'); // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
+    try {
+        const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select('-password'); // $ne -> not equal, we want suggested user which is not equal to userId, and select them on basis of removing their password.
 
-    if (suggestedUsers.length === 0) {
-      return res.status(200).json({
-        success: true,
-        users: [],
-        message: 'No suggested users available'
-      });
+        if (suggestedUsers.length === 0) {
+            return res.status(200).json({
+                success: true,
+                users: [],
+                message: 'No suggested users available'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            users: suggestedUsers
+        });
+
+    } catch (error) {
+        console.error('getSuggestedUser Error:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
     }
-
-    return res.status(200).json({
-      success: true,
-      users: suggestedUsers
-    });
-
-  } catch (error) {
-    console.error('getSuggestedUser Error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Internal server error'
-    });
-  }
 };
 
 
