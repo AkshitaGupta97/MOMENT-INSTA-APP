@@ -4,12 +4,18 @@ import Logo from './Logo';
 import { useAppContext } from '../context/AppContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAuthUser } from '../redux/authSlice';
+import CreatePost from './CreatePost';
 
 const Sidebar = () => {
   const {axios} = useAppContext();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [iscreateOpen, setiscreateOpen] = useState(false);
+
+  const dispatch = useDispatch();
+
 
   const user = useSelector(store => store.auth); // to get value from store we use useSelector
 
@@ -28,6 +34,7 @@ const Sidebar = () => {
     try {
       const response = await axios.get('/api/v1/user/logout');
       if(response.data.success){
+        dispatch(setAuthUser(null));
         navigate('/login');
         toast.success(response.data.message);
       }
@@ -35,6 +42,16 @@ const Sidebar = () => {
       console.log("Sidebar-logout", error);
       toast.error(error.response?.data?.message || "Logout failed");
     }
+  }
+
+  const createPostHandler = () => {
+   // navigate('/create-post');
+   setiscreateOpen(true);
+    // Close sidebar on mobile after clicking
+    if (window.innerWidth < 768) {
+      setIsOpen(false);
+    }
+    console.log("Create Post Clicked");
   }
   
   const sidebarHandler = (textType) => {
@@ -49,7 +66,9 @@ const Sidebar = () => {
     }
     else if (textType === 'Create') {
       // Trigger file input for story creation
-      document.getElementById('story-input').click();
+     // document.getElementById('story-input').click();
+     createPostHandler();
+     setiscreateOpen(true);
     }
     // Close sidebar on mobile after clicking
     if (window.innerWidth < 768) {
@@ -57,12 +76,12 @@ const Sidebar = () => {
     }
   }
 
-  const handleStoryUpload = async (event) => {
+  /*const handleStoryUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('image', file); /* key: image, value: selected file */
+    formData.append('image', file); /* key: image, value: selected file 
 
     try {
       const response = await axios.post('/api/v1/story/add', formData, {
@@ -84,7 +103,7 @@ const Sidebar = () => {
 
     // Reset input
     event.target.value = '';
-  };
+  }; */
 
   return (
     <>
@@ -121,6 +140,8 @@ const Sidebar = () => {
         </div>
       </div>
 
+      <CreatePost iscreateOpen={iscreateOpen} setiscreateOpen={setiscreateOpen} />
+
       {/* Overlay for mobile */}
       {isOpen && (
         <div
@@ -129,7 +150,7 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Hidden file input for story upload */}
+      {/* Hidden file input for story upload 
       <input
         id="story-input"
         type="file"
@@ -137,6 +158,7 @@ const Sidebar = () => {
         onChange={handleStoryUpload}
         className="hidden"
       />
+      */}
     </>
   )
 }
