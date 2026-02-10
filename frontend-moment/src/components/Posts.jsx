@@ -1,12 +1,22 @@
 import { useState, useRef, useEffect } from "react";
 import { Bookmark, Heart, MessageCircle, Send, Trash2 } from "lucide-react";
 import CommentDialog from "./CommentDialog";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { useAppContext } from "../context/AppContext";
+import { setPosts } from "../redux/postSlice";
 
-export const Posts = () => {
+export const Posts = ({post}) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [deleted, setDeleted] = useState(false);
     const menuRef = useRef(null);
+
+    const {posts} = useSelector(store => store.post);
+    const dispatch = useDispatch();
+
+    const {user} = useSelector(store=> store.auth);
+    const {axios} = useAppContext();
+
 
     const [text, setText] = useState('');
     const [open, setOpen] = useState(false);
@@ -38,18 +48,22 @@ export const Posts = () => {
         setMenuOpen(false);
     };
 
-    const handleDelete = () => {
-        setDeleted(true);
-        setMenuOpen(false);
+    const handleDelete = async () => {
+        try {
+            const response = await axios.delete(`/api/v1/post/delete/${post._id}`);
+            if(response.data.success){
+                const updatedPosts = posts.filter((postItem) => postItem._id !== post._id);
+                dispatch(setPosts(updatedPosts));
+                toast.success(response.data.message);
+                setMenuOpen(false);
+            }
+            console.log("Delete Post Response => ", response);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to delete post");
+        }
     };
 
-    if (deleted) {
-        return (
-            <div className="my-8 w-full max-w-md mx-auto bg-pink-400 rounded-lg p-4 text-gray-200">
-                Post removed
-            </div>
-        );
-    }
+    
 
     return (
         <div className="my-2 max-sm:w-[80%] max-sm:font-medium  max-w-lg p-1 mx-auto bg-gray-600 rounded-lg sm:w-11/12 md:w-3/4 lg:w-2/3">
@@ -57,11 +71,10 @@ export const Posts = () => {
                 <div className="flex items-center gap-2">
                     <img
                         className="w-8 h-8 rounded-full cursor-pointer"
-                        src="https://img.freepik.com/premium-photo/love-bird-logo-design-template-abstract-love-bird-logo-design-concept_1308172-107908.jpg"
-                        alt=""
+                        src={post.author.profilePicture} alt={post.author.username}
                     />
 
-                    <h1 className="text-amber-200 font-semibold">username</h1>
+                    <h1 className="text-amber-200 font-semibold">{post.author.username}</h1>
                 </div>
 
                 <div className="relative" ref={menuRef}>
@@ -83,13 +96,17 @@ export const Posts = () => {
                                 <span className="font-semibold text-white">{isFollowing ? "Unfollow" : "Follow"}</span>
                             </button>
 
-                            <button
-                                className="border-t border-gray-100 w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
-                                onClick={handleDelete}
-                            >
-                                <Trash2 className="text-pink-500" size={18} />
-                                <span className="font-semibold text-white">Delete</span>
-                            </button>
+                           {  // this is added as only user can delete the post which is created by him/her, so we are checking whether the user id is same as post author id or not, if it is same then only delete option will be shown in menu.
+                            user._id === post.author._id && (
+                                <button
+                                    className="border-t border-gray-100 w-full text-left px-4 py-2 hover:bg-gray-500 flex items-center gap-2"
+                                    onClick={handleDelete}
+                                >
+                                    <Trash2 className="text-pink-500" size={18} />
+                                    <span className="font-semibold text-white">Delete</span>
+                                </button>
+                            )
+                           }
                         </div>
                     )}
                 </div>
@@ -102,7 +119,7 @@ export const Posts = () => {
             <div className="rounded-lg shadow-md">
                 <img onClick={() => setComment(true)}
                     className="rounded-lg my-1 mx-auto max-w-md w-full max-h-[50vh] object-cover cursor-pointer"
-                    src="https://th.bing.com/th/id/OIP.84UOxylaHnK5msu2i1JECwHaE8?w=239&h=180&c=7&r=0&o=7&pid=1.7&rm=3" alt=""
+                    src={post.image} alt={post.caption}
                 />
                 <CommentDialog 
                   openComment={openComment} 
@@ -127,10 +144,10 @@ export const Posts = () => {
                     </div>
                 </div>
 
-                <span className="text-white font-semibold text-sm">1k Likes</span>
+                <span className="text-white font-semibold text-sm">{post.likes.length} likes</span>
                 <div className=" flex flex-col text-white font-semibold">
-                    <p >username</p>
-                    <p className="text-sm">caption - This is a sample post description.</p>
+                    <p>{post.author.username}</p>
+                    <p className="text-sm text-red-300">{post.caption}</p>
                 </div>
 
                 {

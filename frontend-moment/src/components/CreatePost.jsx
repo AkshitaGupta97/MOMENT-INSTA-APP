@@ -3,10 +3,16 @@ import { readFileAsDataURL } from "../utils/helpUtils";
 import Loader from './Loader'
 import { toast } from "react-toastify";
 import { useAppContext } from "../context/AppContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "../redux/postSlice";
 
 const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
 
+    const {user} = useSelector(store => store.auth);
+
     const {axios} = useAppContext();
+    const dispatch = useDispatch();
+    const {posts} = useSelector(store => store.post);
 
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState('');
@@ -40,6 +46,7 @@ const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
                 }
             });
             if(response.data.success){
+                dispatch(setPosts([response.data.post, ...posts])); // old post is there and new post is added to it
                 toast.success(response.data.message);
                 setCaption('');
                 setImagePreview('');
@@ -48,7 +55,7 @@ const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
             }
             console.log(response, response.data);
         } catch (error) {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Failed to create post");
         } finally{
             setLoading(false);
         }
@@ -66,10 +73,9 @@ const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
                 <div className="flex items-center gap-2">
                     <img
                         className="w-8 h-8 rounded-full cursor-pointer"
-                        src="https://img.freepik.com/premium-photo/love-bird-logo-design-template-abstract-love-bird-logo-design-concept_1308172-107908.jpg"
-                        alt=""
+                        src={user.profilePicture} alt={user.username}
                     />
-                    <h1 className="text-amber-200 max-sm:font-medium font-semibold">username</h1>
+                    <h1 className="text-amber-200 max-sm:font-medium font-semibold">{user.username}</h1>
                 </div>
 
                 <div className="mt-4">
