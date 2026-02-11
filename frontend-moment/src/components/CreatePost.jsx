@@ -73,7 +73,7 @@ const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
                 <div className="flex items-center gap-2">
                     <img
                         className="w-8 h-8 rounded-full cursor-pointer"
-                        src={user.profilePicture} alt={user.username}
+                        src={user.profilePicture || null} alt={user.username}
                     />
                     <h1 className="text-amber-200 max-sm:font-medium font-semibold">{user.username}</h1>
                 </div>
