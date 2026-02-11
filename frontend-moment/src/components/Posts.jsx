@@ -106,7 +106,6 @@ export const Posts = ({post}) => {
             toast.error(error.response?.data?.message || "Failed to add comment");
         }
     }
-
     return (
         <div className="my-2 max-sm:w-[80%] max-sm:font-medium  max-w-lg p-1 mx-auto bg-gray-600 rounded-lg sm:w-11/12 md:w-3/4 lg:w-2/3">
             <div className="flex items-center justify-between p-1">
