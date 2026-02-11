@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 
-const CommentDialog = ({ openComment, setComment, postAuthorId, postAuthor }) => {
+const CommentDialog = ({ openComment, setOpenComment, postAuthorId, postAuthor }) => {
   if (!openComment) return null;
 
   const { axios } = useAppContext();
@@ -75,7 +75,7 @@ const CommentDialog = ({ openComment, setComment, postAuthorId, postAuthor }) =>
   return (
     <div
       className="flex items-center justify-center fixed inset-0 z-50 bg-black bg-opacity-60 p-2 sm:p-4"
-      onClick={() => setComment(false)}
+      onClick={() => setOpenComment(false)}
     >
       <div
         className="flex flex-col md:flex-row w-full max-w-4xl h-[90vh] md:h-auto md:max-h-[80vh] bg-gray-800 rounded-lg overflow-hidden text-white shadow-2xl"
@@ -150,7 +150,7 @@ const CommentDialog = ({ openComment, setComment, postAuthorId, postAuthor }) =>
               }
 
               <button
-                onClick={() => setComment(false)}
+                onClick={() => setOpenComment(false)}
                 className="p-1 rounded hover:bg-gray-700 transition"
                 aria-label="close"
               >

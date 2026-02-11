@@ -177,6 +177,7 @@ export const addCommnet = async(req, res) => {
         const personWhoMadeComment = req.id;
 
         const {textMsg} = req.body;
+
         const post = await Post.findById(postId);
         if(!textMsg){
             return res.status(400).json({
@@ -192,7 +193,7 @@ export const addCommnet = async(req, res) => {
         });
         await comment.populate({
             path: 'author',
-            select: 'username, profilePicture',
+            select: 'username profilePicture',
         });
         // push comment to post model
         post.comments.push(comment._id);  // push comment id in post comments
@@ -213,7 +214,7 @@ export const addCommnet = async(req, res) => {
 export const getCommentsOfPost = async(req, res) => {
     try {
         const postId = req.params.id;
-        const comments = await Commnet.find({post: postId}).populate('author', 'username, profilePicture').sort({createdAt: -1});
+        const comments = await Commnet.find({post: postId}).populate('author', 'username profilePicture').sort({createdAt: -1});
         if(comments.length === 0){
             return res.status(400).json({
                 success: false,

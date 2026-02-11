@@ -15,12 +15,14 @@ export const Posts = ({post}) => {
     const dispatch = useDispatch();
 
     const {user} = useSelector(store=> store.auth);
+    const [liked, setLiked] = useState(post.likes.includes(useSelector(store => store.auth.user._id)) || false); //[useSelector(store => store.auth.user._id)] or [user._id] both are same, we can use any one of them. We are checking whether the user id is present in post.likes array or not, if it is present then liked state will be true otherwise false. This will help us to set the color of like icon and also to toggle like/dislike functionality when user clicks on like icon.
     const {axios} = useAppContext();
-
+    const [postLike, setPostLike] = useState(post.likes.length);  // inintial like count is set to length of post.likes array, which is coming from backend, and whenever user clicks on like/dislike icon we will update this like count based on the response from backend. This will help us to show the updated like count without refreshing the page.
+    const [comment, setComment] = useState(post.comments); 
 
     const [text, setText] = useState('');
     const [open, setOpen] = useState(false);
-    const [openComment, setComment] = useState(false);
+    const [openComment, setOpenComment] = useState(false);
 
     const changeEventHandler = (e) => {
         // remove extra space
@@ -63,7 +65,47 @@ export const Posts = ({post}) => {
         }
     };
 
+    const likeDislikeHandler = async (postId) => {
+        try {
+            const action = liked ? 'dislike' : 'like';
+            const response = await axios.get(`/api/v1/post/${postId}/${action}`);
+            if(response.data.success){
+                const updatedLikes = liked ? postLike - 1 : postLike + 1; // if already liked then we are disliking it so we will decrease the like count by 1, otherwise we will increase the like count by 1
+                setPostLike(updatedLikes);
+                setLiked(!liked);
+                toast.success(response.data.message);
+                console.log("Like/Dislike Post Response => ", response);
+                // After liking/disliking the post, we need to update the posts in redux store to reflect the changes in UI. So we will fetch all the posts again from backend and update the redux store with new posts data. This will help us to show the updated like count and also to toggle like/dislike icon color based on liked state.
+                const allPostsResponse = await axios.get('/api/v1/post/all');
+                if(allPostsResponse.data.success){
+                    dispatch(setPosts(allPostsResponse.data.post));
+                }
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to like/dislike post");
+            console.log("Like/Dislike Post Error => ", error);
+        }
+    }
     
+    const commentHandler = async (text) => {
+        try {
+            const response = await axios.post(`/api/v1/post/${post._id}/comment`, {text}, {headers: {'Content-Type': 'application/json'}});
+            if(response.data.success){
+                const updatedCommentData = [...comment, response.data.comment]; // we are adding new comment to the existing comments array, which is coming from backend response, and then we are setting this updated comments array to comment state using setComment. This will help us to show the new comment in UI without refreshing the page.
+                setComment(updatedCommentData);
+                toast.success(response.data.message);
+
+                // After adding a comment, we need to update the posts in redux store to reflect the changes in UI. So we will fetch all the posts again from backend and update the redux store with new posts data. This will help us to show the updated comments count and also to show the new comment in UI.
+                const allPostsResponse = await axios.get('/api/v1/post/all');
+                if(allPostsResponse.data.success){
+                    dispatch(setPosts(allPostsResponse.data.post));
+                }
+            }
+        } catch (error) {
+            console.log("Comment Post Error => ", error);
+            toast.error(error.response?.data?.message || "Failed to add comment");
+        }
+    }
 
     return (
         <div className="my-2 max-sm:w-[80%] max-sm:font-medium  max-w-lg p-1 mx-auto bg-gray-600 rounded-lg sm:w-11/12 md:w-3/4 lg:w-2/3">
@@ -117,13 +159,13 @@ export const Posts = ({post}) => {
             </div>
 
             <div className="rounded-lg shadow-md">
-                <img onClick={() => setComment(true)}
+                <img onClick={() => setOpenComment(true)}
                     className="rounded-lg my-1 mx-auto max-w-md w-full max-h-[50vh] object-cover cursor-pointer"
                     src={post.image} alt={post.caption}
                 />
                 <CommentDialog 
                   openComment={openComment} 
-                  setComment={setComment}
+                  setOpenComment={setOpenComment}
                   postAuthorId={null} // Replace with actual author ID when available
                   postAuthor={null} // Replace with actual author data when available
                 />
@@ -133,7 +175,7 @@ export const Posts = ({post}) => {
 
                 <div className="flex justify-between items-center">
                     <div className="flex  items-center gap-4">
-                        <Heart size={'22px'} className="cursor-pointer text-white fill-pink-500 hover:text-pink-400 transition" />
+                        <Heart onClick={() => likeDislikeHandler(post._id)} size={'22px'} className={`cursor-pointer text-white ${liked ? 'fill-pink-600 border-pink-600' : ''}`} />
                         <MessageCircle onClick={() => setOpen(!open)} 
                             size={'22px'} className="cursor-pointer text-white hover:text-cyan-400 transition" 
                         />
@@ -144,24 +186,25 @@ export const Posts = ({post}) => {
                     </div>
                 </div>
 
-                <span className="text-white font-semibold text-sm">{post.likes.length} likes</span>
+                <span className="text-white font-semibold text-sm">{postLike} likes</span>
                 <div className=" flex flex-col text-white font-semibold">
-                    <p>{post.author.username}</p>
-                    <p className="text-sm text-red-300">{post.caption}</p>
+                    <p><span className="text-orange-300">@-</span> {post.author.username}</p>
+                    <p className="text-md text-red-300">{post.caption}</p>
+                    <p className="text-sm text-slate-300">{comment.length} comments</p>
                 </div>
 
                 {
                     open && (
                         <>
-                            <p onClick={() => setOpen(false)} className="font-semibold text-sm text-amber-200">View all comments...</p>
+                            <p onClick={() => setOpen(false)} className="font-semibold text-sm text-amber-200">{comment.length===0 ? "Be first to make comment..." : `View all ${comment.length} comments`}</p>
                             
                             <div className="relative">
                                 <input  value={text} onChange={changeEventHandler}
-                                    className="shadow-md outline-none text-xs w-full bg-slate-300 text-gray-800 placeholder:font-semibold placeholder:text-gray-800 rounded-md py-2 px-3"
+                                    className="shadow-md outline-none text-xs w-full bg-slate-300 text-gray-800 placeholder:font-semibold placeholder:text-gray-600 rounded-md py-2 px-3"
                                     type="text" placeholder="add a comment..." 
                                 />
                                 {
-                                    text && <Send onClick={() => setOpen(false)}  size={'22px'} className="absolute right-4 top-1 cursor-pointer text-gray-800 hover:text-amber-800 transition" />
+                                    text && <Send  onClick={() => {commentHandler(text); setOpen(false)}} size={'22px'} className="absolute right-4 top-1 cursor-pointer text-gray-800 hover:text-amber-800 transition" />
                                 }
                             </div>
                         </>
