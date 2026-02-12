@@ -33,3 +33,18 @@ label {
   font-weight: bold;
   font-size: medium;
 }
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4cqb;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #ec8383;
+  border-radius: 4px; 
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}

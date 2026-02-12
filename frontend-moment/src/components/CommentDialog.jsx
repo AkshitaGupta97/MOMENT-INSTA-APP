@@ -2,13 +2,21 @@ import { Heart, Send, Star, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "../redux/postSlice";
 
 const CommentDialog = ({ openComment, setOpenComment }) => {
 
   // hooks ALWAYS first
   const { selectedPost } = useSelector(state => state.post);
   const { axios } = useAppContext();
+
+  const dispatch = useDispatch();
+
+  const [myComment, setMyComment] = useState(selectedPost ? selectedPost.comments || [] : []);
+
+  console.log("checking selected posts", selectedPost);
+  console.log("my comments", myComment);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuref = useRef(null);
@@ -26,9 +34,24 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
   };
 
   // send comment
-  const sendMessageHandler = async () => {
-    alert(text);
-    setText('');
+  const sendCommentHandler = async (text) => {
+    try {
+      const response = await axios.post(`/api/v1/post/${selectedPost._id}/comment`, {textMsg: text }, {headers: {'Content-Type': 'application/json'}});
+      if (response.data.success) {
+        setMyComment(prev => [...prev, response.data.comment]);
+        toast.success(response.data.message);
+        // Clear the input field after successful comment submission
+        const allPostResponse = await axios.get('/api/v1/post/allposts');
+        if(allPostResponse.data.success){
+          dispatch(setPosts(allPostResponse.data.posts));
+        }
+        setText('');
+      }
+      
+    } catch (error) {
+      console.log('error in SendComment', error)
+    }
+   
   };
 
   // close menu outside click
@@ -71,7 +94,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
 
   return (
     <div
-      className="max-sm:h-[70%] max-sm:w-[80%] max-sm:mt-20 flex items-center justify-center fixed inset-0 z-50 bg-black bg-opacity-60 p-2 sm:p-4"
+      className="max-sm:h-[70%] max-sm:w-[80%] max-sm:mt-20 max-md:w-[70%] max-md:h-[60%] max-md:mt-32 flex items-center justify-center fixed inset-0 z-50 bg-black bg-opacity-60 p-2 sm:p-4"
       onClick={() => setOpenComment(false)}
     >
       <div
@@ -80,7 +103,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
       >
 
         {/* LEFT SIDE */}
-        <div className="w-full max-sm:h-[50%] md:w-1/2 border-r border-gray-700 flex flex-col">
+        <div className="w-full max-sm:h-[50%]  max-md:h-[40%] md:w-1/2 border-r border-gray-700 flex flex-col">
           <img
             className="w-full h-[84%] object-cover"
             src={selectedPost.image}
@@ -100,7 +123,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
                   {selectedPost.author.username}
                 </h2>
                 <p className="text-xs text-gray-400">
-                  {selectedPost.author.bio || "No bio"}
+                  {selectedPost.author.caption || "No bio"}
                 </p>
               </div>
             </Link>
@@ -146,8 +169,26 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
             </div>
           </div>
 
-          <div className="flex-1 p-4 overflow-auto text-gray-400">
-            No comments yet
+          <div className="flex flex-col p-2 overflow-y-auto max-h-[30%] text-gray-400">
+            {
+              myComment.length > 0 ? (
+                myComment.map((c) => (
+                  <div key={c._id} className="text-white text-sm mb-2 flex items-center gap-3  ">
+                    <div className="flex items-center gap-1">
+                      <div className="w-10 h-10 rounded-full border-amber-200 p-2">
+                        <img className="w-full h-full rounded-full object-cover" src={c.author.profilePicture || null} alt={c.author.username} />
+                      </div>
+                      <span className="text-amber-200 font-semibold">@{c.author.username}</span>
+                    </div>
+                    <p>{c.text}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="text-sm font-semibold text-gray-400 mt-2">
+                  No comments yet. Be the first to comment!
+                </div>
+              )
+            }
           </div>
 
           <div className="p-4 border-t border-gray-700 flex gap-2">
@@ -158,12 +199,11 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
               placeholder="Add comment..."
             />
 
-            <button
-              disabled={!text.trim()}
-              onClick={sendMessageHandler}
-            >
-              <Send />
-            </button>
+            {
+              text && <button disabled={!text.trim()}>
+                <Send className="text-amber-300" onClick={()=>sendCommentHandler(text)}  />
+              </button>
+            }
           </div>
 
         </div>

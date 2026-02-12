@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bookmark, Heart, MessageCircle, Send, Trash2 } from "lucide-react";
+import { Bookmark, Heart, LucideSquareChevronDown, MessageCircle, Send, Trash2 } from "lucide-react";
 //import CommentDialog from "./CommentDialog";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -7,6 +7,8 @@ import { useAppContext } from "../context/AppContext";
 import { setPosts, setSelectedPost } from "../redux/postSlice";
 
 export const Posts = ({ post, setOpenComment }) => {
+
+    console.log("POst message", post)
 
     // follow state for menu
     const [isFollowing, setIsFollowing] = useState(false);
@@ -34,6 +36,7 @@ export const Posts = ({ post, setOpenComment }) => {
 
     // comments from backend
     const [comment, setComment] = useState(post.comments);
+    const [showComment, setShowComment] = useState(false);
 
     // comment text input
     const [text, setText] = useState('');
@@ -278,6 +281,26 @@ export const Posts = ({ post, setOpenComment }) => {
                 <p>{post.caption}</p>
                 <p className="text-amber-300">{comment.length} comments</p>
             </div>
+
+            {
+                comment.length > 0 ? 
+                    (<div className="mt-2">
+                        <div className="flex justify-center items-center gap-4">
+                            <p className="text-blue-300 font-semibold text-sm ">View all comments...</p> 
+                            <LucideSquareChevronDown className="text-pink-300 hover:text-slate-300 cursor-pointer" size={22} onClick={() => setShowComment(!showComment)} /> 
+                        </div>
+                        { showComment &&  comment.map((c) => (
+                            <div key={c._id} className="text-white text-sm">
+                                <span className="text-amber-200">@{c.author.username}</span> {c.text}
+                            </div>
+                        ))}
+                    </div>
+                ): (
+                    <div className="text-sm font-semibold text-gray-400 mt-2">
+                        No comments yet. Be the first to comment!
+                    </div>
+                )
+            }
 
             {/* comment box */}
             {open && (
