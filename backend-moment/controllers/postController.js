@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import cloudinary from '../config/cloudinary.js';
 import { Post } from '../model/post.model.js';
 import { User } from '../model/user.model.js';
-import { Commnet } from '../model/commnet.model.js';
+import { Comment } from '../model/Comment.model.js';
 
 export const addNewPost = async (req, res) => {
     try {
@@ -84,7 +84,7 @@ export const getUserPost = async(req, res) => { // find({author: authorId}) only
     try {
         const authorId = req.id;
         /*const posts = await Post.find({author: authorId}).sort({createdAt:-1}).populate({   // in posts get author name and details, as who made comment
-            path:'author',  // option-> commnets
+            path:'author',  // option-> Comments
             sort:{createdAt:-1},
             populate:{   // get name and password of user who made comments
                 path:'author',
@@ -170,8 +170,8 @@ export const dislikePost = async(req, res) => {
     }
 };
 
-// function to add commnets on post
-export const addCommnet = async(req, res) => {
+// function to add Comments on post
+export const addComment = async(req, res) => {
     try {
         const postId = req.params.id;
         const personWhoMadeComment = req.id;
@@ -186,7 +186,7 @@ export const addCommnet = async(req, res) => {
             });
         }
 
-        const comment = await Commnet.create({
+        const comment = await Comment.create({
             text: textMsg,
             author: personWhoMadeComment,
             post: postId
@@ -206,15 +206,15 @@ export const addCommnet = async(req, res) => {
         });
 
     } catch (error) {
-        console.log('addCommnet Error', error);
+        console.log('addComment Error', error);
     }
 };
 
-// logic for each post with different commnets -> get comments of each post
+// logic for each post with different Comments -> get comments of each post
 export const getCommentsOfPost = async(req, res) => {
     try {
         const postId = req.params.id;
-        const comments = await Commnet.find({post: postId}).populate('author', 'username profilePicture').sort({createdAt: -1});
+        const comments = await Comment.find({post: postId}).populate('author', 'username profilePicture').sort({createdAt: -1});
         if(comments.length === 0){
             return res.status(400).json({
                 success: false,
@@ -256,7 +256,7 @@ export const deletePost = async(req, res) => {
         await user.save();
 
         // after deleting the post, delete all the comments also
-        await Commnet.deleteMany({post: postId});
+        await Comment.deleteMany({post: postId});
 
         return res.status(200).json({
             success: true,

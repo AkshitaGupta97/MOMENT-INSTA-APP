@@ -8,7 +8,7 @@ import { setPosts, setSelectedPost } from "../redux/postSlice";
 
 export const Posts = ({ post, setOpenComment }) => {
 
-    console.log("POst message", post)
+    //console.log("POst message", post)
 
     // follow state for menu
     const [isFollowing, setIsFollowing] = useState(false);
@@ -35,7 +35,7 @@ export const Posts = ({ post, setOpenComment }) => {
     const [postLike, setPostLike] = useState(post.likes.length);
 
     // comments from backend
-    const [comment, setComment] = useState(post.comments);
+    const [comment, setComment] = useState(post.comments || []);
     const [showComment, setShowComment] = useState(false);
 
     // comment text input
@@ -78,7 +78,6 @@ export const Posts = ({ post, setOpenComment }) => {
         setIsFollowing(p => !p);
         setMenuOpen(false);
     };
-
     // delete post
     const handleDelete = async () => {
         try {
@@ -150,6 +149,7 @@ export const Posts = ({ post, setOpenComment }) => {
             );
 
             if (response.data.success) {
+                console.log("response data add - comment", response.data.comment);
 
                 // add new comment locally
                 const updatedCommentData = [
@@ -177,6 +177,7 @@ export const Posts = ({ post, setOpenComment }) => {
                 error.response?.data?.message ||
                 "Failed to add comment"
             );
+            console.log("error in adding comment", error);
         }
     };
 
@@ -193,7 +194,7 @@ export const Posts = ({ post, setOpenComment }) => {
                         alt={post.author.username}
                     />
                     <h1 className="text-amber-200 font-semibold">
-                        {post.author.username}
+                        {post.author.username} {user?._id === post.author._id && <span className="text-xs text-gray-200">(you💖)</span>}
                     </h1>
                 </div>
 
@@ -278,7 +279,7 @@ export const Posts = ({ post, setOpenComment }) => {
             {/* caption */}
             <div className="text-white font-semibold">
                 <p className="text-slate-300"><span className="text-amber-200 text-sm">@-</span> {post.author.username}</p>
-                <p>{post.caption}</p>
+                <p className="text-xs text-blue-300">-{post.caption}-</p>
                 <p className="text-amber-300">{comment.length} comments</p>
             </div>
 
@@ -313,6 +314,7 @@ export const Posts = ({ post, setOpenComment }) => {
                         type="text"
                         placeholder="add a comment..."
                     />
+
 
                     {text && (
                         <Send

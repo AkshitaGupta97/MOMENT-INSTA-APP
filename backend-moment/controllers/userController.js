@@ -120,15 +120,24 @@ export const login = async (req, res) => {
 // controller for logout
 export const logout = async (_, res) => {
     try {
-        // Clear cookie with same attributes to ensure browser removes it
-        return res.cookie('token', "", { maxAge: 0, sameSite: 'none', secure: false }).json({
+        res.cookie("token", "", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            path: "/",
+            expires: new Date(0),
+        });
+
+        return res.status(200).json({
             message: "😊Logged out successfully...",
-            success: true
-        })
+            success: true,
+        });
+
     } catch (error) {
-        console.log('Logout Error', error);
+        console.log("Logout Error", error);
     }
-}
+};
+
 
 // controller for getProfile
 export const getProfile = async (req, res) => {
