@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom";
+import SuggestedUser from "./SuggestedUser";
 
 const SidebarRightSide = () => {
 
@@ -21,6 +22,8 @@ const SidebarRightSide = () => {
           <span className="text-slate-400 font-semibold text-xs">{'||'} {user?.bio || 'Bio here...'}</span>
         </div>
       </Link>
+      
+      <SuggestedUser />
 
     </div>
   )

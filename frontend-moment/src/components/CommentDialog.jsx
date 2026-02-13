@@ -103,7 +103,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
   /* ================= UI ================= */
   return (
     <div
-      className="fixed max-sm:w-[80%] max-sm:ml-4 inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4"
+      className="fixed max-sm:w-[70%] max-sm:h-[60%] max-sm:ml-4 inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4"
       onClick={() => setOpenComment(false)}
     >
       <div
@@ -120,11 +120,11 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
           <img
             className="w-full max-sm:max-h-64 max-h-[80%] object-cover"
             src={selectedPost.image || null}
-            alt={selectedPost.caption}
+            alt={selectedPost.caption || "my image"}
           />
 
           <div className="p-3">
-            <Link className="flex flex-col  gap-2 items-center">
+            <Link className="flex items-center">
               <img
                 className="w-10 h-10 rounded-full border object-cover"
                 src={selectedPost.author.profilePicture || selectedPost.image || null}
@@ -133,7 +133,6 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
               <h2 className="font-semibold text-amber-300">
                 {selectedPost.author.username}
               </h2>
-              <p className="font-semibold text-sm text-slate-100">{selectedPost.bio} || Bio here... </p>
             </Link>
           </div>
         </div>
@@ -187,7 +186,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
                 <div key={c._id} className="flex gap-3">
                   <img
                     className="w-8 h-8 rounded-full object-cover"
-                    src={c.author.profilePicture}
+                    src={c.author.profilePicture || selectedPost.image || null}
                     alt={c.author.username}
                   />
 

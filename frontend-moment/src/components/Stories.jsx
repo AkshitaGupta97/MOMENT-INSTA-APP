@@ -128,6 +128,7 @@ const Stories = () => {
 
   return (
     <div className="border-b border-amber-300 px-2 py-0">
+      
       <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
         {/* Add Story Button */}
         <div className="flex flex-col items-center space-y-1 flex-shrink-0">

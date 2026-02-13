@@ -65,7 +65,10 @@ const Sidebar = () => {
       navigate('/');
     } 
     else if (textType === 'Profile') {
-      navigate('/profile');
+      navigate(`/profile/${user?._id}`);
+    }
+    else if (textType === 'Explore') {
+      navigate(`/profile/${user?._id}`);
     }
     else if (textType === 'Create') {
       // Trigger file input for story creation
