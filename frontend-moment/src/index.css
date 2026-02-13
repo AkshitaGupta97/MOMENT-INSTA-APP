@@ -42,7 +42,7 @@ label {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ec8383;
+  background: transparent;
   border-radius: 4px; 
 }
 ::-webkit-scrollbar-thumb:hover {

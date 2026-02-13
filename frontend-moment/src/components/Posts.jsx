@@ -182,7 +182,7 @@ export const Posts = ({ post, setOpenComment }) => {
     };
 
     return (
-        <div className="my-2 max-sm:w-[80%] max-w-lg p-1 mx-auto bg-gray-600 rounded-lg">
+        <div className="my-2 max-sm:w-[80%] max-w-[60%] p-1 mx-auto bg-gray-600 rounded-lg">
 
             {/* Header */}
             <div className="flex items-center justify-between p-1">
@@ -240,7 +240,7 @@ export const Posts = ({ post, setOpenComment }) => {
                     dispatch(setSelectedPost(post));
                     setOpenComment(true);
                 }}
-                className="rounded-lg w-full max-h-[50vh] object-cover cursor-pointer"
+                className="rounded-lg w-full max-h-[50vh]  object-cover cursor-pointer"
                 src={post.image}
                 alt={post.caption}
             />
@@ -280,7 +280,7 @@ export const Posts = ({ post, setOpenComment }) => {
             <div className="text-white font-semibold">
                 <p className="text-slate-300"><span className="text-amber-200 text-sm">@-</span> {post.author.username}</p>
                 <p className="text-xs text-blue-300">-{post.caption}-</p>
-                <p className="text-amber-300">{comment.length} comments</p>
+                <p className="text-amber-300 text-xs">{comment.length} comments</p>
             </div>
 
             {
