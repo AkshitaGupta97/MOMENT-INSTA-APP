@@ -254,7 +254,7 @@ export const Posts = ({ post, setOpenComment }) => {
             <div className="flex justify-between p-2">
 
                 <div className="flex gap-4">
-                    <Heart
+                    <Heart 
                         onClick={() =>
                             likeDislikeHandler(post._id)
                         }

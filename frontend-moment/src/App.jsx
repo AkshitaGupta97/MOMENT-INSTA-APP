@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Profile from "./components/Profile";
 import Feed from "./components/Feed";
 import Layout from "./components/Layout";
+import ExploreUsers from "./components/ExploreUser";
 
 const App = () => {
   return (
@@ -27,7 +28,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/feed" element={<Feed />} />
-           
+            <Route path="/exploreUsers" element={<ExploreUsers />} />
           </Route>
 
           <Route path="/signup" element={<SignUp />} />

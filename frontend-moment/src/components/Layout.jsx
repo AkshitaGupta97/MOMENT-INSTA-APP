@@ -1,24 +1,27 @@
-import { Outlet } from "react-router-dom"
-import SidebarRightSide from "./SidebarRightSide";
-import Sidebar from "./Sidebar";
+import { Outlet, useLocation } from "react-router-dom";
 import UseGetAllPost from "../hooks/useGetAllPost";
 import UseGetSuggestedUser from "../hooks/UseSuggestedUsers";
-
+import Sidebar from "./Sidebar"
+import SidebarRightSide from "./SidebarRightSide";
 
 const Layout = () => {
   UseGetAllPost();
   UseGetSuggestedUser();
+
+  const location = useLocation();
+  const isExplorePage = location.pathname === "/exploreUsers";
+
   return (
     <div className="flex min-h-screen">
-        <Sidebar />
+      <Sidebar />
 
-        <div className="flex-1 flex flex-col h-screen">
-          <Outlet />
-        </div>
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto">
+        <Outlet />
+      </div>
 
-        <SidebarRightSide />
+      {!isExplorePage && <SidebarRightSide />}
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

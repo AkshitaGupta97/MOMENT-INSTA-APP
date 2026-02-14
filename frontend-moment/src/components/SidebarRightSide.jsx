@@ -2,12 +2,13 @@ import { useSelector } from "react-redux"
 import { Link } from "react-router-dom";
 import SuggestedUser from "./SuggestedUser";
 
-const SidebarRightSide = () => {
-
+const SidebarRightSide = ({ showOnMobile = false }) => {
   const { user } = useSelector((state) => state.auth);
 
   return (
-    <div className="hidden border-l border-amber-300 md:flex flex-col gap-4 p-4 w-1/4">
+    <div
+      className={`border-l border-amber-300 flex flex-col gap-4 p-4 overflow-y-auto ${showOnMobile ? "flex w-full" : "hidden md:flex md:w-1/4"}`}
+    >
 
       <Link to={`/profile/${user?._id}`} className="flex items-center gap-2 hover:bg-gray-600 p-2 rounded-lg transition-colors duration-200 ease-in-out">
         <div className="flex items-center gap-2">
@@ -22,7 +23,7 @@ const SidebarRightSide = () => {
           <span className="text-slate-400 font-semibold text-xs">{'||'} {user?.bio || 'Bio here...'}</span>
         </div>
       </Link>
-      
+
       <SuggestedUser />
 
     </div>

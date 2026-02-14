@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import UseGetUserProfile from "../hooks/UseGetUserProfile"
 import { useSelector } from "react-redux";
 import { useState } from "react";
+import {Heart, MessageCircle} from 'lucide-react';
 
 const Profile = () => {
 
@@ -76,11 +77,11 @@ const Profile = () => {
       <div className="border-t border-t-gray-200">
         <div className="flex items-center justify-center max-sm:text-sm font-semibold gap-10">
           <span onClick={() => handleTabChange('posts')}
-            className={`py-3 cursor-pointer  ${activeTab==='posts' ? 'bg-slate-500 rounded px-0.5 py-0.5 text-center' : ''}`}>
+            className={`py-3 cursor-pointer  ${activeTab==='posts' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
             POST 
           </span>
           <span onClick={() => handleTabChange('saved')}
-            className={`py-3 cursor-pointer   ${activeTab==='saved' ? 'bg-slate-500 rounded px-0.5 py-0.5 text-center' : ''}`}>
+            className={`py-3 cursor-pointer   ${activeTab==='saved' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
             SAVED 
           </span>
           <span className="py-3 cursor-pointer ">
@@ -91,12 +92,26 @@ const Profile = () => {
           </span>
         </div>
 
-        <div>
+        <div className="grid grid-cols-3 gap-1">
           {
             displayedPost.map((post) => {
               return (
-                <div key={post?._id}>
-                  <img src={post.image} alt={post.username} className="rounded-sm" />
+                <div key={post?._id} className="relative group cursor-pointer">
+                  <img src={post.image} alt={post.username} className="rounded-sm my-2 w-full aspect-square object-cover" />
+
+                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex items-center text-white space-x-4 font-semibold">
+                      <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
+                        <Heart size={28} fill="crimson" className="text-pink-600" />
+                        <span>{post?.likes.length}</span>
+                      </button>
+                      <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
+                        <MessageCircle size={28} className="text-amber-300" />
+                        <span>{post?.comments.length}</span>
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
               )
             })
