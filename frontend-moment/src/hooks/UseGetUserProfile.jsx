@@ -5,27 +5,29 @@ import { toast } from "react-toastify";
 import { useAppContext } from "../context/AppContext";
 
 const UseGetUserProfile = (userId) => {
-    const {axios} = useAppContext();
+    const { axios } = useAppContext();
     const dispatch = useDispatch();
-   // const [userProfile, setUserProfile] = useState(null);
 
     useEffect(() => {
-        const fetchUserProfile = async (userId) => {
+        if (!userId) return;
+
+        const fetchUserProfile = async () => {
             try {
                 const response = await axios.get(`/api/v1/user/${userId}/profile`);
+
                 if (response.data.success) {
                     dispatch(setUserProfile(response.data.user));
                 }
-                console.log("from fetchUserProfile", response.data)
+
+                console.log("from fetchUserProfile", response.data);
             } catch (error) {
                 console.log("Error fetching user profile:", error);
                 toast.error("Failed to fetch user profile");
             }
-        }
+        };
 
         fetchUserProfile();
-    
-    },[userId])
-}
+    }, [userId, axios, dispatch]);
+};
 
 export default UseGetUserProfile;
