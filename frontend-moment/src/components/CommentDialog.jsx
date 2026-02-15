@@ -103,7 +103,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
   /* ================= UI ================= */
   return (
     <div
-      className="fixed max-sm:w-[70%] max-sm:h-[60%] max-sm:ml-4 inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4"
+      className="fixed max-sm:w-[70%] max-sm:h-[70%] max-sm:mt-16 max-sm:ml-4 inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-2 sm:p-4"
       onClick={() => setOpenComment(false)}
     >
       <div
@@ -118,7 +118,7 @@ const CommentDialog = ({ openComment, setOpenComment }) => {
         {/* ================= LEFT IMAGE SIDE ================= */}
         <div className="w-full md:w-1/2 flex flex-col border-r border-gray-700">
           <img
-            className="w-full max-sm:max-h-64 max-h-[80%] object-cover"
+            className="w-full max-sm:max-h-44 max-h-[80%] object-cover"
             src={selectedPost.image || null}
             alt={selectedPost.caption || "my image"}
           />

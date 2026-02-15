@@ -1,8 +1,8 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import UseGetUserProfile from "../hooks/UseGetUserProfile"
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import {Heart, MessageCircle} from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
 
 const Profile = () => {
 
@@ -11,12 +11,12 @@ const Profile = () => {
 
   UseGetUserProfile(userId);
 
-  const { userProfile } = useSelector(store => store.auth);
+  const { userProfile, user } = useSelector(store => store.auth);
 
   console.log("from profile", userProfile);
 
   const isFollowing = false;
-  const isLoggedInUserProfile = true;
+  const isLoggedInUserProfile = user?._id === userProfile?._id;
 
   const [activeTab, setActiveTab] = useState('posts');
 
@@ -47,7 +47,9 @@ const Profile = () => {
             {
               isLoggedInUserProfile ? (
                 <>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Edit </button>
+                  <Link to="/account/edit">
+                    <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Edit </button>
+                  </Link>
                   <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">View </button>
                   <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Tools</button>
                 </>
@@ -67,28 +69,28 @@ const Profile = () => {
             <p>{userProfile?.posts.length} <span className="">posts</span></p>
             <p>{userProfile?.followers.length} <span className="">followers</span></p>
             <p>{userProfile?.following.length} <span className="">following</span></p>
-            
+
           </div>
 
         </div>
 
       </div>
-      
+
       <div className="border-t border-t-gray-200">
         <div className="flex items-center justify-center max-sm:text-sm font-semibold gap-10">
           <span onClick={() => handleTabChange('posts')}
-            className={`py-3 cursor-pointer  ${activeTab==='posts' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
-            POST 
+            className={`py-3 cursor-pointer  ${activeTab === 'posts' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
+            POST
           </span>
           <span onClick={() => handleTabChange('saved')}
-            className={`py-3 cursor-pointer   ${activeTab==='saved' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
-            SAVED 
+            className={`py-3 cursor-pointer   ${activeTab === 'saved' ? 'bg-slate-500 rounded px-1 py-0 text-center' : ''}`}>
+            SAVED
           </span>
           <span className="py-3 cursor-pointer ">
-            REELS 
+            REELS
           </span>
           <span className="py-3 cursor-pointer">
-            TAGS 
+            TAGS
           </span>
         </div>
 
