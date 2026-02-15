@@ -1,10 +1,25 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux"
+import { useAppContext } from "../context/AppContext";
+import {toast} from 'react-router-dom';
 
 export const EditProfile = () => {
 
     const { user } = useSelector(store => store.auth);
     const imageRef = useRef();
+
+    const [loading, setLoading] = useState(false);
+    const {axios} = useAppContext();
+
+    const editProfileHandler = async() => {
+        try {
+            setLoading(true);
+            const response = await axios.post()
+        } catch (error) {
+            toast.error(response.data.message);
+            console.log("error from edit profile", error);
+        }
+    }
 
     return (
         <div className="p-4">
@@ -27,7 +42,7 @@ export const EditProfile = () => {
                     </div>
                         
                     <input type="file" className="hidden" ref={imageRef}  />
-                    <button onClick={() => imageRef.current.click()} className="bg-purple-700 rounded-md hover:scale-95 text-white px-2 py-1">Change Photo</button>
+                    <button onClick={() => imageRef.current.click()} className="bg-purple-700 shadow-lg rounded-md hover:scale-95 text-white px-2 py-1">Change Photo</button>
                 </div>
 
                 <div className="font-semibold m-2 max-w-md">
@@ -45,7 +60,10 @@ export const EditProfile = () => {
                         <option value="female">Female</option>
                         <option value="other">Other</option>
                     </select>
+                </div>
 
+                <div className="mt-4 flex items-right">
+                    <button className="font-semibold bg-blue-500 px-4 py-2 active:scale-95 rounded-lg shadow-lg">Submit</button>
                 </div>
 
 
