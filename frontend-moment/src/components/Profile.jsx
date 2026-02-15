@@ -15,8 +15,8 @@ const Profile = () => {
 
   console.log("from profile", userProfile);
 
-  const isFollowing = true;
-  const isLoggedInUserProfile = false;
+  const isFollowing = false;
+  const isLoggedInUserProfile = true;
 
   const [activeTab, setActiveTab] = useState('posts');
 
@@ -47,15 +47,15 @@ const Profile = () => {
             {
               isLoggedInUserProfile ? (
                 <>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-sm text-sm hover:bg-slate-500 px-2 py-1">Edit Profile </button>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-sm text-sm hover:bg-slate-500 px-2 py-1">View </button>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-sm text-sm hover:bg-slate-500 px-2 py-1">Ad tools</button>
+                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Edit </button>
+                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">View </button>
+                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Tools</button>
                 </>
               ) : (
                 isFollowing ? (
                   <>
-                    <button className="bg-[#0095F6] text-center rounded h-8 max-sm:text-sm font-semibold text-sm hover:bg-[#0377c4] px-2 py-1">Unfollow</button>
-                    <button className="bg-slate-600  text-center rounded h-8 mmax-sm:text-sm font-semibold text-sm hover:bg-slate-500 px-2 py-1">Messsage</button>
+                    <button className="bg-[#0095F6] text-center rounded h-8 max-sm:text-xs font-semibold text-sm hover:bg-[#0377c4] px-2 py-1">Unfollow</button>
+                    <button className="bg-slate-600  text-center rounded h-8 mmax-sm:text-xs font-semibold text-sm hover:bg-slate-500 px-2 py-1">Messsage</button>
                   </>
 
                 ) : (<button className="bg-[#0095F6] text-center rounded h-8 font-semibold text-sm hover:bg-[#0377c4] px-2 py-1">Follow</button>)
@@ -63,7 +63,7 @@ const Profile = () => {
             }
           </div>
 
-          <div className="font-semibold max-sm:text-sm flex items-center gap-4">
+          <div className="font-semibold max-sm:text-xs flex items-center gap-4">
             <p>{userProfile?.posts.length} <span className="">posts</span></p>
             <p>{userProfile?.followers.length} <span className="">followers</span></p>
             <p>{userProfile?.following.length} <span className="">following</span></p>
