@@ -48,3 +48,10 @@ label {
 ::-webkit-scrollbar-thumb:hover {
   background: #555; 
 }
+
+.username-gradient {
+  background: linear-gradient(90deg, #facc15, #fb7185, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+

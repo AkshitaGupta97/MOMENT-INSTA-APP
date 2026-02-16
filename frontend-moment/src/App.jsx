@@ -9,6 +9,7 @@ import Feed from "./components/Feed";
 import Layout from "./components/Layout";
 import ExploreUsers from "./components/ExploreUser";
 import { EditProfile } from "./components/EditProfile";
+import ChatPage from "./components/ChatPage";
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
             <Route path="/feed" element={<Feed />} />
             <Route path="/exploreUsers" element={<ExploreUsers />} />
             <Route path="/account/edit" element={<EditProfile />} />
+            <Route path="/chat" element={<ChatPage />} />
           </Route>
 
           <Route path="/signup" element={<SignUp />} />
