@@ -42,7 +42,7 @@ const Login = () => {
                     },
                 }
             );
-            console.log("signup respose => ", response.data);
+           // console.log("signup respose => ", response.data);
             if(response.data.success){
                 dispatch(setAuthUser(response.data.user));
                 navigate('/');

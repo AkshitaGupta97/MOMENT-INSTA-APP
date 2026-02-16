@@ -14,7 +14,7 @@ const UseGetSuggestedUser = () => {
             try {
                 const response = await axios.get('/api/v1/user/suggested');
                 if (response.data.success) {
-                    console.log("message from fetchSuggestedUser in useGetSuggestedUser", response.data.users, response)
+                  //  console.log("message from fetchSuggestedUser in useGetSuggestedUser", response.data.users, response)
                     dispatch(setSuggestedUser(response.data.users));
                 }
             } catch (error) {

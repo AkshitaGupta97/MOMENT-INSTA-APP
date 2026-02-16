@@ -15,7 +15,7 @@ const UseGetAllPost = () => {
             try {
                 const response = await axios.get('/api/v1/post/all');
                 if (response.data.success) {
-                    console.log("message from fetchAllPost in useGetAll", response.data.post, response)
+                   //  console.log("message from fetchAllPost in useGetAll", response.data.post, response)
                     dispatch(setPosts(response.data.post));
                 }
             } catch (error) {

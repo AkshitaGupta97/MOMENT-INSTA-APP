@@ -53,7 +53,7 @@ const CreatePost = ({ iscreateOpen, setiscreateOpen }) => {
                 setFile('');
                 setiscreateOpen(false);
             }
-            console.log(response, response.data);
+          //  console.log(response, response.data);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to create post");
         } finally{

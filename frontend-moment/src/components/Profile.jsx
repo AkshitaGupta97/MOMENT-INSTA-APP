@@ -13,7 +13,7 @@ const Profile = () => {
 
   const { userProfile, user } = useSelector(store => store.auth);
 
-  console.log("from profile", userProfile);
+  // console.log("from profile", userProfile);
 
   const isFollowing = false;
   const isLoggedInUserProfile = user?._id === userProfile?._id;
@@ -26,7 +26,7 @@ const Profile = () => {
 
   const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks
 
-  console.log('Displayed posts is ', displayedPost);
+  // console.log('Displayed posts is ', displayedPost);
 
   return (
     <div className="flex max-w-3xl max-sm:w-[100%] flex-col justify-center mx-auto pl-10">
@@ -34,9 +34,9 @@ const Profile = () => {
       <div className="flex my-8  gap-20 items-center justify-around ">
 
         <div className='flex flex-col items-left justify-center '>
-          <img className="w-16 h-16 max-sm:w-12 max-sm:h-12 rounded-full border border-amber-200 p-2" src={userProfile?.profilePicture || null} alt={userProfile?.profilePicture} />
+          <img className="w-20 h-20 max-sm:w-16 max-sm:h-16 rounded-full border border-amber-200 p-1" src={userProfile?.profilePicture || null} alt={userProfile?.profilePicture} />
           <p className="text-amber-200 text-xl max-sm:text-md font-semibold">{userProfile?.username}</p>
-          <p className="font-semibold text-sm">{userProfile?.bio || 'Bio here...'}</p>
+          <p className="font-semibold text-green-300 text-sm">{userProfile?.bio || 'Bio here...'}</p>
           <p className="font-semibold bg-slate-500 cursor-pointer rounded px-2 py-1 text-center text-orange-200 text-sm">@-{userProfile.username}</p>
         </div>
 
@@ -51,7 +51,7 @@ const Profile = () => {
                     <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Edit </button>
                   </Link>
                   <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">View </button>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Tools</button>
+                  {/*<button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Tools</button> */}
                 </>
               ) : (
                 isFollowing ? (
@@ -65,10 +65,20 @@ const Profile = () => {
             }
           </div>
 
-          <div className="font-semibold max-sm:text-xs flex items-center gap-4">
-            <p>{userProfile?.posts.length} <span className="">posts</span></p>
-            <p>{userProfile?.followers.length} <span className="">followers</span></p>
-            <p>{userProfile?.following.length} <span className="">following</span></p>
+          <div className="font-semibold max-sm:text-xs max-lg:text-sm max-md:text-sm flex flex-col items-center gap-4">
+            <div className="flex justify-center items-center gap-6">
+              <p>{userProfile?.posts.length} <span className="">posts</span></p>
+              <p>{userProfile?.followers.length} <span className="">followers</span></p>
+              <p>{userProfile?.following.length} <span className="">following</span></p>
+            </div>
+
+            <div className="text-slate-300">
+              <p>✨ Fresh profile, fresh vibes 😄</p>
+              <p>📸 New picture, same energy 💫</p>
+              <p>🚀 Updating life one step at a time</p>
+              <p>💛 Keep growing, keep shining</p>
+              <p>🔥 New look unlocked!</p>
+            </div>
 
           </div>
 

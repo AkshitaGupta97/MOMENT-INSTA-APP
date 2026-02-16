@@ -17,6 +17,8 @@ export const AppContextProvider = ({ children }) => {
     axios: api,
   };
 
+  console.log("Axios baseURL:", api.defaults.baseURL);
+
   return (
     <AppContext.Provider value={value}>
       {children}

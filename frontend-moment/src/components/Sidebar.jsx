@@ -54,7 +54,7 @@ const Sidebar = () => {
     if (window.innerWidth < 768) {
       setIsOpen(false);
     }
-    console.log("Create Post Clicked");
+   // console.log("Create Post Clicked");
   }
   
   const sidebarHandler = (textType) => {
@@ -114,7 +114,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="md:hidden fixed top-6 right-2 z-50">
+      <div className="md:hidden max-sm:text-sm fixed top-6 right-2 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="bg-gray-700 text-white p-2 rounded-lg shadow-lg"
@@ -129,13 +129,13 @@ const Sidebar = () => {
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         md:translate-x-0 md:static md:w-1/5 w-64
       `}>
-        <div className='flex flex-col font-semibold space-y-5 text-md'>
+        <div className='flex flex-col font-semibold space-y-5 max-sm:space-y-3 max-sm:text-sm text-md'>
           <Logo />
           {
             sidebarItems.map((item, index) => {
               return (
                 <div onClick={() => sidebarHandler(item.text)}
-                  className='relative flex items-center justify-center space-x-2 hover:bg-gray-600 py-2 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-200 ease-in-out'
+                  className='relative flex items-center  justify-center space-x-2 hover:bg-gray-600 py-2 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-200 ease-in-out'
                   key={index}>
                   <p>{item.icon}</p>
                   <span>{item.text}</span>
