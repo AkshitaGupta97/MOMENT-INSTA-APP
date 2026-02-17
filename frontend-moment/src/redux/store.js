@@ -48,12 +48,12 @@ const store = configureStore({
                     PERSIST,
                     PURGE,
                     REGISTER,
+                    "socketio/setSocketIo", // ✅ ignore socket action
                 ],
-
-                // ✅ ignore socket path
-                ignoredPaths: ["socketio.socket"],
+                ignoredPaths: ["socketio.socket"], // ignore state
             },
         }),
+
 });
 
 export default store;

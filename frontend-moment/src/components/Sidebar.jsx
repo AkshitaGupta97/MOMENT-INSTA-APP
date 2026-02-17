@@ -70,6 +70,9 @@ const Sidebar = () => {
     else if (textType === 'Explore') {
       navigate('/exploreUsers');
     }
+    else if (textType === 'Message') {
+      navigate('/chat');
+    }
     else if (textType === 'Create') {
       // Trigger file input for story creation
      // document.getElementById('story-input').click();

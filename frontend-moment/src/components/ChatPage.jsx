@@ -7,8 +7,9 @@ import { Link } from "react-router-dom";
 const ChatPage = () => {
   const { user, suggestedUser } = useSelector((store) => store.auth);
 
+  const { onlineUsers } = useSelector(store => store.chat);
+
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isOnline, setIsOnline] = useState(true);
 
   return (
     <div className="flex h-screen font-semibold bg-gray-950 text-white">
@@ -29,43 +30,46 @@ const ChatPage = () => {
               alt={user?.username}
               className="w-10 h-10 rounded-full object-cover"
             />
-            <span className={`absolute bottom-0 right-0 w-3 h-3 ${isOnline ? 'bg-green-400 border-2' : 'bg-red-600 border-2'} border-gray-900 rounded-full`}></span>
+            <span className={`absolute bottom-0 right-0 w-3 h-3 border-gray-900 rounded-full`}></span>
           </div>
 
           <div>
             <h1 className="font-semibold text-lg username-gradient">
               {user?.username}
             </h1>
-            <span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>
+            {/*<span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>*/}
           </div>
         </div>
 
         {/* Users List */}
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
-          {suggestedUser?.map((suggUser) => (
-            <div
-              key={suggUser._id}
-              onClick={() => setSelectedUser(suggUser)}
-              className="flex  items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
-            >
-              <div className="relative">
-                <img
-                  src={suggUser?.profilePicture || null}
-                  alt={suggUser?.username}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <span className={`absolute bottom-0 right-0 w-3 h-3 ${isOnline ? 'bg-green-400 border-2' : 'bg-red-600 border-2'} border-gray-900 rounded-full`}></span>
-              </div>
+          {suggestedUser?.map((suggUser) => {
+            const isOnline = onlineUsers.includes(suggUser?._id);
+            return (
+              <div 
+                key={suggUser._id}
+                onClick={() => setSelectedUser(suggUser)}
+                className="flex  items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
+              >
+                <div className="relative">
+                  <img
+                    src={suggUser?.profilePicture || null}
+                    alt={suggUser?.username}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <span className={`absolute bottom-0 right-0 w-3 h-3 ${isOnline ? 'bg-green-400 border-2' : 'bg-red-600 border-2'} border-gray-900 rounded-full`}></span>
+                </div>
 
-              <div>
-                <h2 className="font-semibold">{suggUser?.username}</h2>
-                <p className="text-xs text-gray-400">
-                  <span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>
-                </p>
-              </div>
+                <div>
+                  <h2 className="font-semibold">{suggUser?.username}</h2>
+                  <p className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>
+                  </p>
+                </div>
 
-            </div>
-          ))}
+              </div>
+            )
+          })}
         </div>
       </div>
 

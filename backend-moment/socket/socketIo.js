@@ -34,6 +34,9 @@ const userSocketMap = {};
 //   "user456": "socket_xyz456"
 // }
 
+// function to get receiver id
+export const getReciverSocketId = (receiverId) => userSocketMap[receiverId];
+
 // Runs whenever a new client connects
 io.on('connection', (socket) => {
 
