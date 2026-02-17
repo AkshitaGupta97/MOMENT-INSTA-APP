@@ -7,11 +7,12 @@ import userRoute from './routes/userRoutes.js';
 import postRouter from './routes/postRoute.js';
 import messageRouter from './routes/messageRoute.js';
 import storyRouter from './routes/storyRoute.js';
+import { app, server } from './socket/socketIo.js'
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-const app = express();
+//const app = express();
 
 // middleware
 app.use(express.json());
@@ -33,6 +34,11 @@ app.use('/api/v1/story', storyRouter);
 
 // start server
 await connectDB();
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
+/*app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+});*/

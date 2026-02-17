@@ -25,7 +25,7 @@ const ChatPage = () => {
         <div className="flex items-center gap-3 px-4 py-4 bg-gray-900 shadow-md">
           <div className="relative">
             <img
-              src={user?.profilePicture}
+              src={user?.profilePicture || null}
               alt={user?.username}
               className="w-10 h-10 rounded-full object-cover"
             />
@@ -50,7 +50,7 @@ const ChatPage = () => {
             >
               <div className="relative">
                 <img
-                  src={suggUser?.profilePicture}
+                  src={suggUser?.profilePicture || null}
                   alt={suggUser?.username}
                   className="w-10 h-10 rounded-full object-cover"
                 />
@@ -89,7 +89,7 @@ const ChatPage = () => {
               </button>
 
               <img
-                src={selectedUser.profilePicture}
+                src={selectedUser.profilePicture || null}
                 className="w-9 h-9 rounded-full object-cover"
               />
 

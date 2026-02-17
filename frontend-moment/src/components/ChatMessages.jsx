@@ -9,7 +9,7 @@ const ChatMessages = ({ selectedUser }) => {
                 {
                     [1,2,3,4].map((msg) => {
                         return (
-                            <div className={`flex `}>
+                            <div key={msg._id} className={`flex `}>
                                 <div className=''>
                                     {msg}
                                 </div>
