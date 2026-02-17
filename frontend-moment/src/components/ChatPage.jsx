@@ -1,11 +1,14 @@
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, MoveRightIcon, Send } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import ChatMessages from "./ChatMessages";
+import { Link } from "react-router-dom";
 
 const ChatPage = () => {
   const { user, suggestedUser } = useSelector((store) => store.auth);
 
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isOnline, setIsOnline] = useState(true);
 
   return (
     <div className="flex h-screen font-semibold bg-gray-950 text-white">
@@ -26,14 +29,14 @@ const ChatPage = () => {
               alt={user?.username}
               className="w-10 h-10 rounded-full object-cover"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-gray-900 rounded-full"></span>
+            <span className={`absolute bottom-0 right-0 w-3 h-3 ${isOnline ? 'bg-green-400 border-2' : 'bg-red-600 border-2'} border-gray-900 rounded-full`}></span>
           </div>
 
           <div>
             <h1 className="font-semibold text-lg username-gradient">
               {user?.username}
             </h1>
-            <span className="text-xs text-gray-400">Online</span>
+            <span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>
           </div>
         </div>
 
@@ -43,20 +46,24 @@ const ChatPage = () => {
             <div
               key={suggUser._id}
               onClick={() => setSelectedUser(suggUser)}
-              className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
+              className="flex  items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
             >
-              <img
-                src={suggUser?.profilePicture}
-                alt={suggUser?.username}
-                className="w-10 h-10 rounded-full object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={suggUser?.profilePicture}
+                  alt={suggUser?.username}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <span className={`absolute bottom-0 right-0 w-3 h-3 ${isOnline ? 'bg-green-400 border-2' : 'bg-red-600 border-2'} border-gray-900 rounded-full`}></span>
+              </div>
 
               <div>
-                <h2 className="font-medium">{suggUser?.username}</h2>
-                <span className="text-xs text-gray-400">
-                  Start conversation
-                </span>
+                <h2 className="font-semibold">{suggUser?.username}</h2>
+                <p className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400">{isOnline ? 'Online' : 'Offline'}</span>
+                </p>
               </div>
+
             </div>
           ))}
         </div>
@@ -89,15 +96,46 @@ const ChatPage = () => {
               <h2 className="font-semibold">
                 {selectedUser.username}
               </h2>
+              <Link to={`/profile/${selectedUser?._id}`} className='flex items-center justify-center text-blue-400 text-xs'>
+                View Profile <button> <MoveRightIcon size={16} /> </button>
+              </Link>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 flex items-center justify-center text-gray-500">
-              Chat coming soon 💬
+            {/* Messages Area  Chat coming soon 💬 */}
+            <div className="flex flex-col flex-1 bg-gray-950">
+
+              <div className="flex-1 flex items-center justify-center text-gray-500">
+                <div className='flex flex-col justify-start items-center p-2 bg-gray-900 rounded-md shadow-lg'>
+                  <div className="flex justify-center items-center gap-2">
+                    <img className="w-12 h-12 rounded-full p-2 border border-amber-200 " src={selectedUser?.profilePicture || null} alt={selectedUser?.username} />
+                    <p>{selectedUser.username}</p>
+                  </div>
+                  <Link to={`/profile/${selectedUser?._id}`} className='flex items-center justify-center text-blue-400 text-xs'>
+                    View Profile <button> <MoveRightIcon size={16} /> </button>
+                  </Link>
+                </div>
+              </div>
+
+              <ChatMessages selectedUser={selectedUser} />
+
+              {/* Message Input */}
+              <div className="flex items-center gap-2 p-3 border-t border-gray-800 bg-gray-900">
+                <input
+                  type="text"
+                  placeholder="Message..."
+                  className="flex-1 bg-gray-800 text-gray-200 px-4 py-2 rounded-full outline-none focus:ring-2 focus:ring-purple-600 transition"
+                />
+
+                <button className="bg-purple-600 hover:bg-purple-700 p-2 rounded-full transition active:scale-95">
+                  <Send size={20} />
+                </button>
+              </div>
+
             </div>
+
           </>
         ) : (
-          <div className="flex items-center justify-center text-gray-500">
+          <div className="flex-1 flex items-center justify-center text-gray-500">
             Select a chat to start messaging 💬
           </div>
         )}
