@@ -3,6 +3,7 @@ import cloudinary from '../config/cloudinary.js';
 import { Post } from '../model/post.model.js';
 import { User } from '../model/user.model.js';
 import { Comment } from '../model/Comment.model.js';
+import { getReciverSocketId } from '../socket/socketIo.js';
 
 export const addNewPost = async (req, res) => {
     try {
@@ -130,8 +131,21 @@ export const likePost = async(req, res) => {
         await post.save();
 
         // implement socket io for real time notification
-        
-
+        const user = await User.findById(userWhoLikeThePost).select('username profilePicture');
+        const postOwnerId = post.author.toString(); //as if user like its own post then don't show message
+        if(postOwnerId !== userWhoLikeThePost){
+            // show notification who liked the post
+            const notification = {
+                type: 'like',
+                userId: userWhoLikeThePost,
+                userDetails: user,
+                postId, 
+                message: "Your Post was liked"
+            }
+            // send notification to owner of post
+            const postOwnerSocketId = getReciverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit('notification', notification);
+        }
 
         return res.status(200).json({
             success: true,
@@ -160,6 +174,23 @@ export const dislikePost = async(req, res) => {
         // dislike logic. ==  $pull -> by this you can remove value or pull it
         await post.updateOne({$pull: {likes: userWhoDislikeThePost} }); 
         await post.save();
+
+        // implement socket io for real time notification
+        const user = await User.findById(userWhoDislikeThePost).select('username profilePicture');
+        const postOwnerId = post.author.toString(); //as if user like its own post then don't show message
+        if(postOwnerId !== userWhoDislikeThePost){
+            // show notification who liked the post
+            const notification = {
+                type: 'dislike',
+                userId: userWhoDislikeThePost,
+                userDetails: user,
+                postId, 
+                message: "Your Post was disliked"
+            }
+            // send notification to owner of post
+            const postOwnerSocketId = getReciverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit('notification', notification);
+        }
 
         return res.status(200).json({
             success: true,

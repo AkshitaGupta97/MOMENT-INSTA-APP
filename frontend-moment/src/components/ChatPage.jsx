@@ -1,15 +1,45 @@
 import { MoveLeft, MoveRightIcon, Send } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ChatMessages from "./ChatMessages";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
+import { toast } from 'react-toastify';
+import { setMessages } from "../redux/chatSlice";
+import { useEffect } from "react";
+import { setSelectedUser } from "../redux/authSlice";
 
 const ChatPage = () => {
-  const { user, suggestedUser } = useSelector((store) => store.auth);
+  const { user, suggestedUser, selectedUser } = useSelector((store) => store.auth);
+  const [textMessage, setTextMessage] = useState('');
+  const {axios} = useAppContext();
+  const { onlineUsers, messages } = useSelector(store => store.chat);
+  const dispatch = useDispatch();
+  //const [selectedUser, setSelectedUser] = useState(null);
+  
 
-  const { onlineUsers } = useSelector(store => store.chat);
+  const sendMessageHandler = async(receiverId) => {
+    try {
+      const response = await axios.post(`/api/v1/message/send/${receiverId}`, {textMessage}, {
+        headers: {
+          'Content-Type':'application/json'
+        },
+      });
+      if(response.data.success){
+        dispatch(setMessages([...messages, response.data.newMessage]));
+        setMessages("");
+      }
+    } catch (error) {
+      toast.error(response.data.error);
+      console.log("message from sendMessage", error);
+    }
+  }
 
-  const [selectedUser, setSelectedUser] = useState(null);
+  useEffect(() => {
+    return () => {
+      dispatch(setSelectedUser(null));
+    }
+  }, []);
 
   return (
     <div className="flex h-screen font-semibold bg-gray-950 text-white">
@@ -48,7 +78,7 @@ const ChatPage = () => {
             return (
               <div 
                 key={suggUser._id}
-                onClick={() => setSelectedUser(suggUser)}
+                onClick={() => dispatch(setSelectedUser(suggUser))}
                 className="flex  items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
               >
                 <div className="relative">
@@ -125,12 +155,13 @@ const ChatPage = () => {
               {/* Message Input */}
               <div className="flex items-center gap-2 p-3 border-t border-gray-800 bg-gray-900">
                 <input
+                  value={textMessage} onChange={(e) => setTextMessage(e.target.value)}
                   type="text"
                   placeholder="Message..."
                   className="flex-1 bg-gray-800 text-gray-200 px-4 py-2 rounded-full outline-none focus:ring-2 focus:ring-purple-600 transition"
                 />
 
-                <button className="bg-purple-600 hover:bg-purple-700 p-2 rounded-full transition active:scale-95">
+                <button onClick={() => sendMessageHandler(selectedUser?._id)} className="bg-purple-600 hover:bg-purple-700 p-2 rounded-full transition active:scale-95">
                   <Send size={20} />
                 </button>
               </div>
