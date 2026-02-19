@@ -59,7 +59,7 @@ export const getMessage = async (req, res) => {
             return res.status(200).json({success: true, messages: []}); // it means if message is not started then give the empty array
         }
 
-        return res.status(200).json({success: true, messages: conversation?.messages});
+        return res.status(200).json({success: true, messages: conversation?.message});
 
     } catch (error) {
         console.log('getMessage Error', error);

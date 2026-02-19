@@ -29,6 +29,8 @@ const ChatPage = () => {
         setTextMessage("");
       }
 
+      console.log("messages type:", messages);
+
     } catch (error) {
       toast.error(error.response?.data?.message || "Message failed");
       console.log("error from sendMessage", error);
@@ -106,68 +108,63 @@ const ChatPage = () => {
       {/* Chat Area */}
       <div
         className={`
-          flex-1 flex flex-col
-          ${selectedUser ? "flex" : "hidden sm:flex"}
-        `}
+        flex-1 flex flex-col h-screen
+        ${selectedUser ? "flex" : "hidden sm:flex"}
+      `}
       >
         {selectedUser ? (
           <>
-            {/* Chat Header */}
+            {/* ================= HEADER ================= */}
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-900 border-b border-gray-800">
-              {/* Back button mobile */}
               <button
-                onClick={() => setSelectedUser(null)}
+                onClick={() => dispatch(setSelectedUser(null))}
                 className="sm:hidden text-gray-300 text-xl mr-2"
               >
                 <MoveLeft fill="yellow" />
               </button>
 
               <img
-                src={selectedUser.profilePicture || null}
+                src={selectedUser?.profilePicture || ""}
                 className="w-9 h-9 rounded-full object-cover"
+                alt=""
               />
 
-              <h2 className="font-semibold">
-                {selectedUser.username}
-              </h2>
-              <Link to={`/profile/${selectedUser?._id}`} className='flex items-center justify-center text-blue-400 text-xs'>
-                View Profile <button> <MoveRightIcon size={16} /> </button>
-              </Link>
+              <div className="flex flex-col">
+                <h2 className="font-semibold">{selectedUser?.username}</h2>
+                <Link
+                  to={`/profile/${selectedUser?._id}`}
+                  className="text-blue-400 text-xs"
+                >
+                  View Profile
+                </Link>
+              </div>
             </div>
 
-            {/* Messages Area  Chat coming soon 💬 */}
-            <div className="flex flex-col flex-1 bg-gray-950">
+            {/* ================= CHAT BODY ================= */}
+            <div className="flex flex-col overflow-y-auto flex-1 bg-gray-950">
 
-              <div className="flex-1 flex items-center justify-center text-gray-500">
-                <div className='flex flex-col justify-start items-center p-2 bg-gray-900 rounded-md shadow-lg'>
-                  <div className="flex justify-center items-center gap-2">
-                    <img className="w-12 h-12 rounded-full p-2 border border-amber-200 " src={selectedUser?.profilePicture || null} alt={selectedUser?.username} />
-                    <p>{selectedUser.username}</p>
-                  </div>
-                  <Link to={`/profile/${selectedUser?._id}`} className='flex items-center justify-center text-blue-400 text-xs'>
-                    View Profile <button> <MoveRightIcon size={16} /> </button>
-                  </Link>
-                </div>
-              </div>
-
+              {/* Messages */}
               <ChatMessages selectedUser={selectedUser} />
 
-              {/* Message Input */}
-              <div className="flex items-center gap-2 p-3 border-t border-gray-800 bg-gray-900">
+              {/* ================= INPUT ================= */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-gray-900 border-t border-gray-800">
                 <input
-                  value={textMessage} onChange={(e) => setTextMessage(e.target.value)}
+                  value={textMessage}
+                  onChange={(e) => setTextMessage(e.target.value)}
                   type="text"
                   placeholder="Message..."
-                  className="flex-1 bg-gray-800 text-gray-200 px-4 py-2 rounded-full outline-none focus:ring-2 focus:ring-purple-600 transition"
+                  className="flex-1 bg-gray-800 text-white px-4 py-2 rounded-full outline-none focus:ring-2 focus:ring-purple-600"
                 />
 
-                <button onClick={() => sendMessageHandler(selectedUser?._id)} className="bg-purple-600 hover:bg-purple-700 p-2 rounded-full transition active:scale-95">
-                  <Send size={20} />
+                <button
+                  onClick={() => sendMessageHandler(selectedUser?._id)}
+                  className="bg-purple-600 hover:bg-purple-700 p-2 rounded-full transition active:scale-95"
+                >
+                  <Send size={18} />
                 </button>
               </div>
 
             </div>
-
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-gray-500">
@@ -175,6 +172,7 @@ const ChatPage = () => {
           </div>
         )}
       </div>
+
     </div>
   );
 };

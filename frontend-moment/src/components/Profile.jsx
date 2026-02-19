@@ -37,7 +37,7 @@ const Profile = () => {
           <img className="w-20 h-20 max-sm:w-16 max-sm:h-16 rounded-full border border-amber-200 p-1" src={userProfile?.profilePicture || null} alt={userProfile?.profilePicture} />
           <p className="text-amber-200 text-xl max-sm:text-md font-semibold">{userProfile?.username}</p>
           <p className="font-semibold text-green-300 text-sm">{userProfile?.bio || 'Bio here...'}</p>
-          <p className="font-semibold bg-slate-500 cursor-pointer rounded px-2 py-1 text-center text-orange-200 text-sm">@-{userProfile.username}</p>
+          <p className="font-semibold bg-slate-500 cursor-pointer rounded px-2 py-1 text-center text-orange-200 text-sm">@-{userProfile?.username}</p>
         </div>
 
         <div className="flex flex-col gap-5">
@@ -105,33 +105,37 @@ const Profile = () => {
         </div>
 
         <div className="grid grid-cols-3 gap-1">
-          {
-            displayedPost.map((post) => {
-              return (
-                <div key={post?._id} className="relative group cursor-pointer">
-                  <img src={post.image} alt={post.username} className="rounded-sm my-2 w-full aspect-square object-cover" />
+          {displayedPost?.length > 0 ? (
+            displayedPost.map((post) => (
+              <div key={post?._id} className="relative group cursor-pointer">
+                <img
+                  src={post.image}
+                  alt={post.username}
+                  className="rounded-sm my-2 w-full aspect-square object-cover"
+                />
 
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="flex items-center text-white space-x-4 font-semibold">
-                      <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
-                        <Heart size={28} fill="crimson" className="text-pink-600" />
-                        <span>{post?.likes.length}</span>
-                      </button>
-                      <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
-                        <MessageCircle size={28} className="text-amber-300" />
-                        <span>{post?.comments.length}</span>
-                      </button>
-                    </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="flex items-center text-white space-x-4 font-semibold">
+                    <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
+                      <Heart size={28} fill="crimson" className="text-pink-600" />
+                      <span>{post?.likes?.length || 0}</span>
+                    </button>
+                    <button className="flex items-center gap-2 bg-slate-800 px-1 rounded hover:text-gray-300">
+                      <MessageCircle size={28} className="text-amber-300" />
+                      <span>{post?.comments?.length || 0}</span>
+                    </button>
                   </div>
-
                 </div>
-              )
-            })
-          }
+              </div>
+            ))
+          ) : (
+            <p className="text-center font-semibold col-span-3 text-gray-400 py-10">
+              No posts available
+            </p>
+          )}
         </div>
 
       </div>
-
 
     </div>
   )
