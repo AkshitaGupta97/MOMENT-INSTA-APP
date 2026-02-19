@@ -17,7 +17,7 @@ const ChatMessages = ({ selectedUser }) => {
                         return (
                             <div key={msg._id} className={`flex `}>
                                 <div className=''>
-                                    {msg}
+                                    {msg.message}
                                 </div>
                             </div>
                         )

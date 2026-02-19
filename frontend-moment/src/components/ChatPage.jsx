@@ -25,16 +25,16 @@ const ChatPage = () => {
           'Content-Type':'application/json'
         },
       });
+      console.log(response.data);
       if(response.data.success){
         dispatch(setMessages([...messages, response.data.newMessage]));
         setMessages("");
       }
     } catch (error) {
-      toast.error(response.data.error);
-      console.log("message from sendMessage", error);
+      toast.error(error);
+      console.log("error from sendMessage", error);
     }
-  }
-
+  }                                                                                                                                                                                                                                                        
   useEffect(() => {
     return () => {
       dispatch(setSelectedUser(null));

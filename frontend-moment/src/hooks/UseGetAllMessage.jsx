@@ -22,7 +22,7 @@ const UseGetAllMessage = () => {
         }
 
         fetchAllMessage();
-    }, [])
+    }, [selectedUser]);
 }
 
 export default UseGetAllMessage;
