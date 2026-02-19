@@ -12,29 +12,29 @@ import { setSelectedUser } from "../redux/authSlice";
 const ChatPage = () => {
   const { user, suggestedUser, selectedUser } = useSelector((store) => store.auth);
   const [textMessage, setTextMessage] = useState('');
-  const {axios} = useAppContext();
+  const { axios } = useAppContext();
   const { onlineUsers, messages } = useSelector(store => store.chat);
   const dispatch = useDispatch();
   //const [selectedUser, setSelectedUser] = useState(null);
-  
 
-  const sendMessageHandler = async(receiverId) => {
+
+  const sendMessageHandler = async (receiverId) => {
     try {
-      const response = await axios.post(`/api/v1/message/send/${receiverId}`, {textMessage}, {
-        headers: {
-          'Content-Type':'application/json'
-        },
+      const response = await axios.post(`/api/v1/message/send/${receiverId}`, { textMessage }, {
+        headers: { 'Content-Type': 'application/json' },
       });
-      console.log(response.data);
-      if(response.data.success){
+
+      if (response.data.success) {
         dispatch(setMessages([...messages, response.data.newMessage]));
-        setMessages("");
+        setTextMessage("");
       }
+
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response?.data?.message || "Message failed");
       console.log("error from sendMessage", error);
     }
-  }                                                                                                                                                                                                                                                        
+  };
+
   useEffect(() => {
     return () => {
       dispatch(setSelectedUser(null));
@@ -76,7 +76,7 @@ const ChatPage = () => {
           {suggestedUser?.map((suggUser) => {
             const isOnline = onlineUsers.includes(suggUser?._id);
             return (
-              <div 
+              <div
                 key={suggUser._id}
                 onClick={() => dispatch(setSelectedUser(suggUser))}
                 className="flex  items-center gap-3 p-2 hover:bg-gray-800 rounded-lg cursor-pointer transition"
