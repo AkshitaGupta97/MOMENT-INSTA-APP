@@ -3,7 +3,8 @@ import cloudinary from '../config/cloudinary.js';
 import { Post } from '../model/post.model.js';
 import { User } from '../model/user.model.js';
 import { Comment } from '../model/Comment.model.js';
-import { getReciverSocketId } from '../socket/socketIo.js';
+import { io } from "../socket/socketIo.js";
+import { getReciverSocketId } from "../socket/socketIo.js";
 
 export const addNewPost = async (req, res) => {
     try {
@@ -144,6 +145,9 @@ export const likePost = async(req, res) => {
             }
             // send notification to owner of post
             const postOwnerSocketId = getReciverSocketId(postOwnerId);
+            console.log("Post Owner Socket ID:", postOwnerSocketId);
+            console.log("postOwnerId:", postOwnerId);
+           
             io.to(postOwnerSocketId).emit('notification', notification);
         }
 

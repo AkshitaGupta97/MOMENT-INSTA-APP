@@ -10,13 +10,15 @@ import CreatePost from './CreatePost';
 import { setPosts, setSelectedPost } from '../redux/postSlice';
 
 const Sidebar = () => {
-  const {axios} = useAppContext();
+  const { axios } = useAppContext();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [iscreateOpen, setiscreateOpen] = useState(false);
+  const { likeNotification } = useSelector(store => store.realTimeNotification);
+
+  console.log("likeNotification: sidebar =>", likeNotification);
 
   const dispatch = useDispatch();
-
 
   const user = useSelector(store => store.auth); // to get value from store we use useSelector
 
@@ -34,7 +36,7 @@ const Sidebar = () => {
   const logOutHandler = async () => {
     try {
       const response = await axios.get('/api/v1/user/logout');
-      if(response.data.success){
+      if (response.data.success) {
         dispatch(setAuthUser(null));
         dispatch(setSelectedPost(null));
         dispatch(setPosts([]));
@@ -48,22 +50,22 @@ const Sidebar = () => {
   }
 
   const createPostHandler = () => {
-   // navigate('/create-post');
-   setiscreateOpen(true);
+    // navigate('/create-post');
+    setiscreateOpen(true);
     // Close sidebar on mobile after clicking
     if (window.innerWidth < 768) {
       setIsOpen(false);
     }
-   // console.log("Create Post Clicked");
+    // console.log("Create Post Clicked");
   }
-  
+
   const sidebarHandler = (textType) => {
-    if(textType === 'Logout'){
+    if (textType === 'Logout') {
       logOutHandler();
-    } 
+    }
     else if (textType === 'Home') {
       navigate('/');
-    } 
+    }
     else if (textType === 'Profile') {
       navigate(`/profile/${user?._id}`);
     }
@@ -75,30 +77,46 @@ const Sidebar = () => {
     }
     else if (textType === 'Create') {
       // Trigger file input for story creation
-     // document.getElementById('story-input').click();
-     createPostHandler();
-     setiscreateOpen(true);
+      // document.getElementById('story-input').click();
+      createPostHandler();
+      setiscreateOpen(true);
     }
     // Close sidebar on mobile after clicking
     if (window.innerWidth < 768) {
       setIsOpen(false);
+    }
+
+    if (textType === 'Notification' && likeNotification.length > 0) {
+      toast(`${likeNotification.length} new Notification${likeNotification.length > 1 ? 's' : ""
+        }❤️`),
+      {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "linear-gradient(135deg, #1f2937, #111827)",
+          color: "#f9fafb",
+          borderRadius: "14px",
+          padding: "12px 16px",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
+        },
+      }
     }
   }
 
   /*const handleStoryUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+ 
     const formData = new FormData();
     formData.append('image', file); /* key: image, value: selected file 
-
+ 
     try {
       const response = await axios.post('/api/v1/story/add', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',  //This request contains a file.
         },
       });
-
+ 
       console.log('Sidebar handleStoryUpload response:', response?.data);
       if (response.data.success) {
         toast.success('Story added successfully!');
@@ -109,7 +127,7 @@ const Sidebar = () => {
       console.log("Error uploading story:", error);
       toast.error("Failed to add story");
     }
-
+ 
     // Reset input
     event.target.value = '';
   }; */
@@ -142,6 +160,7 @@ const Sidebar = () => {
                   key={index}>
                   <p>{item.icon}</p>
                   <span>{item.text}</span>
+
                 </div>
               )
             })
@@ -172,4 +191,5 @@ const Sidebar = () => {
   )
 }
 
-export default Sidebar
+
+export default Sidebar;

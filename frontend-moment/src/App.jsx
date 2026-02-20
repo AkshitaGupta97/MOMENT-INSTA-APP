@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSocketIo } from "./redux/socketChatSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
+import { setLikeNotification } from "./redux/realtimenotificationSlice";
 
 const App = () => {
   const { user } = useSelector((store) => store.auth);
@@ -52,6 +53,11 @@ const App = () => {
 
         // Save online users in Redux store
         dispatch(setOnlineUsers(onlineuser));
+      });
+
+      // get real time notification
+      socketio.on('notification', (notification) => {
+        dispatch(setLikeNotification(notification));
       });
     }
     
