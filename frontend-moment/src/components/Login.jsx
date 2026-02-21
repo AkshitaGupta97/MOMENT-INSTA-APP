@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Logo from "./Logo"
 import { useAppContext } from "../context/AppContext";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "./Loader";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAuthUser } from "../redux/authSlice";
 
 const Login = () => {
@@ -12,7 +12,8 @@ const Login = () => {
     const { axios } = useAppContext();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
+    const {user} = useSelector(store=> store.auth);
+    
     const dispatch = useDispatch(); // we use dispatch to call functions
 
     const [input, setInput] = useState({
@@ -61,6 +62,13 @@ const Login = () => {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        if(user){
+            navigate('/');
+        }
+
+    }, [])
 
     return (
         <div className="w-screen h-screen flex justify-center items-center bg-gradient-to-br from-gray-600 to-pink-500">

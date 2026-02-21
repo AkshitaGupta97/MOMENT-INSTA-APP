@@ -181,6 +181,18 @@ export const Posts = ({ post, setOpenComment }) => {
         }
     };
 
+    const bookMarkHandler = async () => {
+        try {
+            const response = await axios.get(`/api/v1/post/${post?._id}/bookmark`);
+            if (response.data.success) {
+                toast.success(response.data.message);
+            }
+        } catch (error) {
+            console.log("error from habdle bookmark", error);
+            toast(error?.response?.data.message);
+        }
+    }
+
     return (
         <div className="my-2 max-sm:w-[80%] max-w-[60%] p-1 mx-auto bg-gray-600 rounded-lg">
 
@@ -211,11 +223,20 @@ export const Posts = ({ post, setOpenComment }) => {
                         <div className="absolute font-semibold right-0 mt-2 w-44 bg-gray-500 rounded">
 
                             <button
-                                className="flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-600"
+                                className={`flex items-center gap-2 w-full px-4 py-2 hover:bg-gray-600 transition-colors`}
                                 onClick={toggleFollow}
                             >
-                                <Heart size={16} />
-                                {isFollowing ? "Unfollow" : "Follow"}
+                                {post?.author?._id !== user?._id && (
+                                    <>
+                                        <Heart
+                                            size={16}
+                                            className={`transition-colors ${isFollowing ? "text-pink-500 fill-pink-500" : "text-gray-300"}`}
+                                        />
+                                        <span>
+                                            {isFollowing ? "Unfollow" : "Follow"}
+                                        </span>
+                                    </>
+                                )}
                             </button>
 
                             {/* Delete Post */}
@@ -254,14 +275,14 @@ export const Posts = ({ post, setOpenComment }) => {
             <div className="flex justify-between p-2">
 
                 <div className="flex gap-4">
-                    <Heart 
+                    <Heart
                         onClick={() =>
                             likeDislikeHandler(post._id)
                         }
-                        className={`cursor-pointer text-white ${liked ? 'fill-pink-600' : ''}`}
+                        className={`transition-colors ${liked ? "text-red-500 fill-red-500" : "text-gray-300"}`}
                     />
 
-                    <MessageCircle 
+                    <MessageCircle
                         onClick={() => setOpen(!open)}
                         className="cursor-pointer text-white hover:text-amber-700"
                     />
@@ -269,7 +290,7 @@ export const Posts = ({ post, setOpenComment }) => {
                     <Send className="cursor-pointer text-white hover:text-green-400" />
                 </div>
 
-                <Bookmark className="cursor-pointer text-white hover:text-amber-300" />
+                <Bookmark onClick={bookMarkHandler} className="cursor-pointer text-white hover:text-amber-300" />
             </div>
 
             <span className="text-white font-semibold">
@@ -284,23 +305,23 @@ export const Posts = ({ post, setOpenComment }) => {
             </div>
 
             {
-                comment.length > 0 ? 
+                comment.length > 0 ?
                     (<div className="mt-2">
                         <div className="flex justify-center items-center gap-4">
-                            <p className="text-blue-300 font-semibold text-sm ">View all comments...</p> 
-                            <LucideSquareChevronDown className="text-pink-300 hover:text-slate-300 cursor-pointer" size={22} onClick={() => setShowComment(!showComment)} /> 
+                            <p className="text-blue-300 font-semibold text-sm ">View all comments...</p>
+                            <LucideSquareChevronDown className="text-pink-300 hover:text-slate-300 cursor-pointer" size={22} onClick={() => setShowComment(!showComment)} />
                         </div>
-                        { showComment &&  comment.map((c) => (
+                        {showComment && comment.map((c) => (
                             <div key={c._id} className="text-white text-sm">
                                 <span className="text-amber-200">@{c.author.username}</span> {c.text}
                             </div>
                         ))}
                     </div>
-                ): (
-                    <div className="text-sm font-semibold text-gray-400 mt-2">
-                        No comments yet. Be the first to comment!
-                    </div>
-                )
+                    ) : (
+                        <div className="text-sm font-semibold text-gray-400 mt-2">
+                            No comments yet. Be the first to comment!
+                        </div>
+                    )
             }
 
             {/* comment box */}

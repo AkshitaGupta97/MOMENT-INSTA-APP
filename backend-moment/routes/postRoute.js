@@ -13,6 +13,6 @@ postRouter.get('/:id/dislike', isAuthenticated, dislikePost);
 postRouter.post('/:id/comment', isAuthenticated, addComment);
 postRouter.post('/:id/comment/all', isAuthenticated, getCommentsOfPost);
 postRouter.delete('/delete/:id', isAuthenticated, deletePost);
-postRouter.post('/:id/bookmark', isAuthenticated, bookMarkPost);
+postRouter.get('/:id/bookmark', isAuthenticated, bookMarkPost);
 
 export default postRouter;

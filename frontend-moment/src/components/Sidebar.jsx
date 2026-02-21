@@ -86,10 +86,21 @@ const Sidebar = () => {
       setIsOpen(false);
     }
 
-    if (textType === 'Notification' && likeNotification.length > 0) {
-      toast(`${likeNotification.length} new Notification${likeNotification.length > 1 ? 's' : ""
-        }❤️`),
-      {
+    if (textType === "Notification" && likeNotification.length > 0) {
+
+      const latestNotification = likeNotification[0];
+      const total = likeNotification.length;
+
+      let message = "";
+
+      if (total === 1) {
+        message = `${latestNotification.senderName} liked your post ❤️`;
+      } else {
+        message = `${latestNotification.senderName} and ${total - 1
+          } others liked your post ❤️`;
+      }
+
+      toast(message, {
         duration: 3000,
         position: "top-right",
         style: {
@@ -99,7 +110,7 @@ const Sidebar = () => {
           padding: "12px 16px",
           boxShadow: "0 10px 25px rgba(0,0,0,0.3)",
         },
-      }
+      });
     }
   }
 
@@ -135,7 +146,7 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="md:hidden max-sm:text-sm fixed top-6 right-2 z-50">
+      <div className="md:hidden max-sm:text-sm fixed top-6 right-3 z-50">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="bg-gray-700 text-white p-2 rounded-lg shadow-lg"
@@ -158,7 +169,14 @@ const Sidebar = () => {
                 <div onClick={() => sidebarHandler(item.text)}
                   className='relative flex items-center  justify-center space-x-2 hover:bg-gray-600 py-2 rounded-lg cursor-pointer hover:scale-105 transition-transform duration-200 ease-in-out'
                   key={index}>
-                  <p>{item.icon}</p>
+
+                  <div className="relative">
+                    {item.icon}
+                    {item.text === "Notification" && likeNotification.length > 0 && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-gray-800"></span>
+                    )}
+                  </div>
+
                   <span>{item.text}</span>
 
                 </div>

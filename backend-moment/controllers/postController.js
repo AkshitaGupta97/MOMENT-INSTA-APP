@@ -5,6 +5,7 @@ import { User } from '../model/user.model.js';
 import { Comment } from '../model/Comment.model.js';
 import { io } from "../socket/socketIo.js";
 import { getReciverSocketId } from "../socket/socketIo.js";
+import { Notification } from '../model/notification.model.js';
 
 export const addNewPost = async (req, res) => {
     try {
@@ -114,7 +115,7 @@ export const getUserPost = async(req, res) => { // find({author: authorId}) only
 };
 
 // to like  posts
-export const likePost = async(req, res) => {
+/*export const likePost = async(req, res) => {
     try {
         const userWhoLikeThePost = req.id;
         const postId = req.params.id;
@@ -159,10 +160,70 @@ export const likePost = async(req, res) => {
     } catch (error) {
         console.log('likePost Error', error);
     }
-}
+}*/
+
+export const likePost = async (req, res) => {
+  try {
+    const userId = req.id;
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Add like, addToSet helps to prevent duplication
+    await post.updateOne({ $addToSet: { likes: userId } });
+     await post.save();
+    const postOwnerId = post.author.toString();
+
+    if (postOwnerId !== userId) {  // it means post is not liked by the user itself
+
+      // Prevent duplicate notification
+      const existing = await Notification.findOne({
+        receiver: postOwnerId,
+        sender: userId,
+        post: postId,
+        type: "like"
+      });
+
+      if (!existing) { //“Only create a notification if one does NOT already exist.”
+        const newNotification = await Notification.create({
+          receiver: postOwnerId,
+          sender: userId,
+          type: "like",
+          post: postId,
+        });
+
+        const socketId = getReciverSocketId(postOwnerId);
+
+        if (socketId) {
+          io.to(socketId).emit("notification", newNotification);
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Post liked",
+    });
+
+  } catch (error) {
+    console.log("likePost error:", error);
+  }
+};
+/*
+existing means:
+“Does a like notification already exist in the database for this exact action?”
+It searches MongoDB for a document that matches:
+👤 receiver → post owner
+👤 sender → user who liked
+📄 post → specific post
+❤️ type → "like"
+*/
 
 // dislike post
-export const dislikePost = async(req, res) => {
+/*export const dislikePost = async(req, res) => {
     try {
         const userWhoDislikeThePost = req.id;
         const postId = req.params.id;
@@ -204,7 +265,66 @@ export const dislikePost = async(req, res) => {
     } catch (error) {
         console.log('dislikePost Error', error);
     }
+};*/
+
+export const dislikePost = async (req, res) => {
+  try {
+    const userId = req.id;
+    const postId = req.params.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({
+        message: "😥 Sorry Post not found...",
+        success: false,
+      });
+    }
+
+    // 1️⃣ Remove like from post
+    await post.updateOne({
+      $pull: { likes: userId }
+    });
+
+    const postOwnerId = post.author.toString();
+
+    // 2️⃣ If not self action
+    if (postOwnerId !== userId) {
+
+      // 3️⃣ Delete existing like notification
+      const deletedNotification = await Notification.findOneAndDelete({
+        receiver: postOwnerId,
+        sender: userId,
+        post: postId,
+        type: "like",
+      });
+
+      // 4️⃣ If post owner is online → emit removal
+      const postOwnerSocketId = getReciverSocketId(postOwnerId);
+
+      if (postOwnerSocketId && deletedNotification) {
+        io.to(postOwnerSocketId).emit("removeNotification", {
+          postId,
+          sender: userId,
+          type: "like",
+        });
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "😥 Post unliked...",
+    });
+
+  } catch (error) {
+    console.log("dislikePost Error", error);
+  }
 };
+/*
+Only send real-time remove notification if:
+The post owner is online
+A like notification was actually deleted from the database”
+*/
 
 // function to add Comments on post
 export const addComment = async(req, res) => {
@@ -304,7 +424,7 @@ export const deletePost = async(req, res) => {
     }
 }
 
-// how to saveor do bookmark to post
+// how to save or do bookmark to post
 export const bookMarkPost = async(req, res) => {
     try {
         const postId = req.params.id;

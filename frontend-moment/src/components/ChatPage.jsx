@@ -126,7 +126,7 @@ const ChatPage = () => {
               <img
                 src={selectedUser?.profilePicture || ""}
                 className="w-9 h-9 rounded-full object-cover"
-                alt=""
+                alt={selectedUser?.username}
               />
 
               <div className="flex flex-col">
