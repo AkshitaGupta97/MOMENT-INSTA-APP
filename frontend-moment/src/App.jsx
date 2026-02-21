@@ -17,6 +17,8 @@ import { setSocketIo } from "./redux/socketChatSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { removeLikeNotification, setLikeNotification } from "./redux/realtimenotificationSlice";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Notification from "./components/Notification";
+
 
 const App = () => {
   const { user } = useSelector((store) => store.auth);
@@ -101,6 +103,7 @@ const App = () => {
               <Route path="/exploreUsers" element={<ExploreUsers />} />
               <Route path="/account/edit" element={<EditProfile />} />
               <Route path="/chat" element={<ChatPage />} />
+              <Route path="/notification" element={<Notification />} />
             </Route>
 
             <Route path="/signup" element={<SignUp />} />

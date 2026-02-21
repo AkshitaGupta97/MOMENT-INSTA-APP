@@ -271,7 +271,8 @@ export const followUnfollow = async (req, res) => {
             ]);
             return res.status(201).json({
                 message: "😥Unfollowed successfully...",
-                status: true
+                success: true,
+                type: "unfollow"
             });
         }
         else {  // if we didnot follow them then give follow logic
@@ -281,12 +282,17 @@ export const followUnfollow = async (req, res) => {
             ]);
             return res.status(201).json({
                 message: "😊Followed successfully...",
-                success: true
+                success: true,
+                type: "follow"
             });
         }
 
 
     } catch (error) {
         console.log('followUnfollow Error', error);
+        return res.status(500).json({
+            message: "Server error",
+            success: false
+        });
     }
 }

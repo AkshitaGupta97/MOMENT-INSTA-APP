@@ -42,10 +42,11 @@ const SuggestedUser = () => {
                             </div>
                         </Link>
 
-                        <button className="text-sm text-blue-500 font-semibold ml-3 whitespace-nowrap">
+                       {/*
+                         <button className="text-sm text-blue-500 font-semibold ml-3 whitespace-nowrap">
                             Follow
                         </button>
-
+                       */}
                     </div>
                 ))}
             </div>

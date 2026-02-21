@@ -1,21 +1,64 @@
 import { Link, useParams } from "react-router-dom";
 import UseGetUserProfile from "../hooks/UseGetUserProfile"
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { Heart, MessageCircle } from 'lucide-react';
+import { setUserProfile } from "../redux/authSlice";
+import { toast } from "react-toastify";
+import { useAppContext } from "../context/AppContext";
 
 const Profile = () => {
 
   const params = useParams();
   const userId = params.id;
 
+  const { axios } = useAppContext();
+
   UseGetUserProfile(userId);
+
+  const dispatch = useDispatch();
 
   const { userProfile, user } = useSelector(store => store.auth);
 
   // console.log("from profile", userProfile);
 
-  const isFollowing = false;
+  const isFollowing = userProfile?.followers?.includes(user?._id);
+
+  const handleFollowToggle = async () => {
+    try {
+      const res = await axios.post(
+        `/api/v1/user/followunfollow/${userProfile._id}`
+      );
+
+      if (res.data.success) {
+
+        // Update Redux follower list
+        let updatedFollowers;
+
+        if (res.data.type === "unfollow") {
+          updatedFollowers = userProfile.followers.filter(
+            (id) => id !== user._id
+          );
+        } else {
+          updatedFollowers = [...userProfile.followers, user._id];
+        }
+
+        dispatch(
+          setUserProfile({
+            ...userProfile,
+            followers: updatedFollowers,
+          })
+        );
+
+        // 🔥 Toast message from backend
+        toast.success(res.data.message);
+      }
+
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
+    }
+  };
+
   const isLoggedInUserProfile = user?._id === userProfile?._id;
 
   const [activeTab, setActiveTab] = useState('posts');
@@ -48,19 +91,31 @@ const Profile = () => {
               isLoggedInUserProfile ? (
                 <>
                   <Link to="/account/edit">
-                    <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Edit </button>
+                    <button className="bg-slate-600 rounded h-8 font-semibold text-sm hover:bg-slate-500 px-2 py-1">
+                      Edit
+                    </button>
                   </Link>
-                  <button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">View </button>
-                  {/*<button className="bg-slate-600 text-center rounded h-8 font-semibold max-sm:text-xs text-sm hover:bg-slate-500 px-2 py-1">Tools</button> */}
                 </>
               ) : (
-                isFollowing ? (
-                  <>
-                    <button className="bg-[#0095F6] text-center rounded h-8 max-sm:text-xs font-semibold text-sm hover:bg-[#0377c4] px-2 py-1">Unfollow</button>
-                    <button className="bg-slate-600  text-center rounded h-8 mmax-sm:text-xs font-semibold text-sm hover:bg-slate-500 px-2 py-1">Messsage</button>
-                  </>
+                <>
+                  <button
+                    onClick={handleFollowToggle}
+                    className={`rounded h-8 font-semibold text-sm px-3 py-1 transition-colors ${isFollowing
+                      ? "bg-[#2371a5] hover:bg-[#0b7eca]"
+                      : "bg-[#0095F6] hover:bg-[#0377c4]"
+                      }`}
+                  >
+                    {isFollowing ? "Unfollow" : "Follow"}
+                  </button>
 
-                ) : (<button className="bg-[#0095F6] text-center rounded h-8 font-semibold text-sm hover:bg-[#0377c4] px-2 py-1">Follow</button>)
+                  {isFollowing && (
+                    <Link to='/chat'>
+                      <button className="bg-slate-600 rounded h-8 font-semibold text-sm hover:bg-slate-500 px-2 py-1">
+                        Message
+                      </button>
+                    </Link>
+                  )}
+                </>
               )
             }
           </div>
@@ -68,7 +123,7 @@ const Profile = () => {
           <div className="font-semibold max-sm:text-xs max-lg:text-sm max-md:text-sm flex flex-col items-center gap-4">
             <div className="flex justify-center items-center gap-6">
               <p>{userProfile?.posts.length} <span className="">posts</span></p>
-              <p>{userProfile?.followers.length} <span className="">followers</span></p>
+              <p>{userProfile?.followers.length || 0} <span className="">followers</span></p>
               <p>{userProfile?.following.length} <span className="">following</span></p>
             </div>
 

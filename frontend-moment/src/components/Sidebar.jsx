@@ -24,7 +24,7 @@ const Sidebar = () => {
 
   const sidebarItems = [
     { icon: <Home />, text: "Home" },
-    { icon: <Search />, text: "Search" },
+   // { icon: <Search />, text: "Search" },
     { icon: <TrendingUp />, text: "Explore" },
     { icon: <MessageCircle />, text: "Message" },
     { icon: <Heart />, text: "Notification" },
@@ -71,6 +71,9 @@ const Sidebar = () => {
     }
     else if (textType === 'Explore') {
       navigate('/exploreUsers');
+    }
+    else if (textType === 'Notification') {
+      navigate('/notification');
     }
     else if (textType === 'Message') {
       navigate('/chat');
