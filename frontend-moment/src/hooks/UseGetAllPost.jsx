@@ -5,7 +5,7 @@ import { setPosts } from "../redux/postSlice";
 import { useDispatch } from 'react-redux'
 
 
-const UseGetAllPost = () => {
+const useGetAllPost = () => {
 
     const { axios } = useAppContext();
     const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const UseGetAllPost = () => {
                     error.response?.data?.message ||
                     "Failed to fetch posts"
                 );
-                console.log('error in UseGetAllPost',error)
+                console.log('error in useGetAllPost',error)
             }
 
         }
@@ -33,4 +33,4 @@ const UseGetAllPost = () => {
 
 }
 
-export default UseGetAllPost;
+export default useGetAllPost;
