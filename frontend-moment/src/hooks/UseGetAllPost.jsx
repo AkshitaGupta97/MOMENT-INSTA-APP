@@ -21,7 +21,7 @@ const useTempGetAllPost = () => {
                     error.response?.data?.message ||
                     "Failed to fetch posts"
                 );
-                console.log('error in useGetAllPost',error)
+                console.log('error in useTempGetAllPost',error)
             }
         }
 
