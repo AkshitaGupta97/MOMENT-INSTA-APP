@@ -331,11 +331,10 @@ export const Posts = ({ post, setOpenComment }) => {
                     <input
                         value={text}
                         onChange={changeEventHandler}
-                        className="w-full bg-slate-300 text-gray-800 rounded-md py-2 px-3"
+                        className="w-full bg-slate-300 text-sm font-semibold text-gray-800 rounded-md py-2 px-3"
                         type="text"
                         placeholder="add a comment..."
                     />
-
 
                     {text && (
                         <Send

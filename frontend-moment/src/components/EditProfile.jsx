@@ -69,11 +69,8 @@ export const EditProfile = () => {
     return (
         <div className="p-4">
             <h1 className="font-bold max-sm:font-semibold text-yellow-400 text-xl">Edit Profile</h1>
-
             <section className="p-6">
-
                 <div className="flex font-semibold max-sm:text-sm items-center justify-between gap-2 bg-slate-500 p-2 rounded-xl ">
-
                     <div className="flex items-center gap-2">
                         <img
                             className="w-12 h-12 rounded-full border-amber-300 border p-1 object-cover "
@@ -117,9 +114,6 @@ export const EditProfile = () => {
                     }
 
                 </div>
-
-
-
 
             </section>
 

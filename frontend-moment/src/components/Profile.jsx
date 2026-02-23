@@ -154,9 +154,6 @@ const Profile = () => {
           <span className="py-3 cursor-pointer ">
             REELS
           </span>
-          <span className="py-3 cursor-pointer">
-            TAGS
-          </span>
         </div>
 
         <div className="grid grid-cols-3 gap-1">

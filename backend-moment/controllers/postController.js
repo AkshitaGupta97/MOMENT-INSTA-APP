@@ -456,5 +456,3 @@ export const bookMarkPost = async(req, res) => {
     }
 }
 
-
-

@@ -66,7 +66,7 @@ const Stories = () => {
 
   const handleDeleteStory = async (storyId) => {
     try {
-      const response = await axios.delete(`/api/v1/story/${storyId}`);
+      const response = await axios.delete(`/api/v1/story/${storyId}/delete`);
       if (response.data.success) {
         toast.success('Story deleted successfully!');
         setSelectedStory(null);
@@ -94,9 +94,21 @@ const Stories = () => {
     acc[authorId].stories.push(story);  //stories: [story1, story2]
     return acc;
   }, {});
-  /* {  final output :
-      A: { stories: [story1, story2] },
-      B: { stories: [story3] }
+  /*
+  - stories.reduce((acc, story) => {...}, {})
+  - reduce iterates over each story in the stories array.
+  - acc (short for accumulator) starts as an empty object {}.
+  - const authorId = story.author._id;
+  - Each story has an author object with an _id.
+  - This _id is used as the key to group stories by author.
+  - if (!acc[authorId]) {...}
+  - If this author hasn’t been added to the accumulator yet:
+  - Create a new entry:
+   {  final output :
+      acc[authorId] = {
+      author: story.author, // store the author object
+      stories: []           // initialize an empty array of stories
+    };
     }
   */
   const storyAuthors = Object.values(groupedStories); /* convert into array -> [  {...},  {...}] */
@@ -128,12 +140,12 @@ const Stories = () => {
 
   return (
     <div className="border-b border-amber-300 px-2 py-0">
-      
+
       <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
         {/* Add Story Button */}
         <div className="flex flex-col items-center space-y-1 flex-shrink-0">
           <div className="relative">
-            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-colors" 
+            <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center cursor-pointer hover:from-purple-600 hover:to-pink-600 transition-colors"
               onClick={() => fileInputRef.current.click()}>
               <Plus className="w-8 h-8 text-white" />
             </div>

@@ -8,6 +8,6 @@ const storyRouter = express.Router();
 storyRouter.post('/add', isAuthenticated, upload.single('image'), addStory);
 storyRouter.get('/all', isAuthenticated, getStories);
 storyRouter.post('/:id/view', isAuthenticated, viewStory);
-storyRouter.delete('/:id', isAuthenticated, deleteStory);
+storyRouter.delete('/:id/delete', isAuthenticated, deleteStory);
 
 export default storyRouter;
