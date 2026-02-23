@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import cloudinary from '../config/cloudinary.js';
 import { Post } from '../model/post.model.js';
 import { User } from '../model/user.model.js';
-import { Comment } from '../model/Comment.model.js';
+import { Comment } from '../model/comment.model.js';
 import { io } from "../socket/socketIo.js";
 import { getReciverSocketId } from "../socket/socketIo.js";
 import { Notification } from '../model/notification.model.js';
