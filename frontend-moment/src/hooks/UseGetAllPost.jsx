@@ -4,7 +4,7 @@ import { useAppContext } from "../context/AppContext";
 import { setPosts } from "../redux/postSlice";
 import { useDispatch } from 'react-redux'
 
-const useGetAllPost = () => {
+const useTempGetAllPost = () => {
     const { axios } = useAppContext();
     const dispatch = useDispatch();
 
@@ -29,4 +29,4 @@ const useGetAllPost = () => {
     }, []);
 }
 
-export default useGetAllPost;
+export default useTempGetAllPost;

@@ -2,10 +2,10 @@
 //import { Posts } from '../components/Posts';
 import Stories from '../components/Stories';
 import PostAll from '../components/PostAll';
-import useGetAllPost from '../hooks/useGetAllPost';
+import useTempGetAllPost from '../hooks/useGetAllPost';
 
 const Home = () => {
-  useGetAllPost();
+  useTempGetAllPost();
   return (
     <>
       <div className="flex-shrink-0 pt-2">
