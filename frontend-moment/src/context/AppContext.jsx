@@ -3,9 +3,9 @@ import axios from "axios";
 
 export const AppContext = createContext();
 
-const backendUrl = "http://localhost:8000"; // your backend
+// ✅ Use environment variable instead of localhost
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-// create axios instance with prefix
 const api = axios.create({
   baseURL: backendUrl,
   withCredentials: true,
@@ -26,5 +26,4 @@ export const AppContextProvider = ({ children }) => {
   );
 };
 
-// custom hook
 export const useAppContext = () => useContext(AppContext);
