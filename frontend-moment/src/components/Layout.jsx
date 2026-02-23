@@ -1,11 +1,11 @@
 import { Outlet, useLocation } from "react-router-dom";
-import UseGetAllPost from "../hooks/useGetAllPost";
 import UseGetSuggestedUser from "../hooks/UseSuggestedUsers";
 import Sidebar from "./Sidebar"
 import SidebarRightSide from "./SidebarRightSide";
+import useTempGetAllPost from "../hooks/useGetAllPost";
 
 const Layout = () => {
-  UseGetAllPost();
+  useTempGetAllPost();
   UseGetSuggestedUser();
 
   const location = useLocation();
