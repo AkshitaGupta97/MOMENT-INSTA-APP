@@ -2,7 +2,7 @@
 //import { Posts } from '../components/Posts';
 import Stories from '../components/Stories';
 import PostAll from '../components/PostAll';
-import useGetAllPost from '../hooks/UseGetAllPost';
+import useGetAllPost from '../hooks/useGetAllPost';
 
 const Home = () => {
   useGetAllPost();
