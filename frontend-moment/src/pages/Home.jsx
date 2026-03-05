@@ -2,7 +2,7 @@
 //import { Posts } from '../components/Posts';
 import Stories from '../components/Stories';
 import PostAll from '../components/PostAll';
-import useTempGetAllPost from '../hooks/useGetAllPost.jsx';
+import useTempGetAllPost from '../hooks/useTempGetAllPost.jsx';
 
 const Home = () => {
   useTempGetAllPost();
