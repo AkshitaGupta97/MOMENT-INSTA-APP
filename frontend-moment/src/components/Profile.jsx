@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import UseGetUserProfile from "../hooks/UseGetUserProfile"
+import UseGetUserProfile from "../hooks/UseGetUserProfile.jsx"
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { Heart, MessageCircle } from 'lucide-react';

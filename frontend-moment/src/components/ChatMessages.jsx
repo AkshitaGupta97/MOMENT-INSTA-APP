@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useEffect, useRef } from "react";
-import UseGetAllMessage from "../hooks/UseGetAllMessage";
-import UseGetRealTimeMessage from "../hooks/UseGetRealTimeMessage";
+import UseGetAllMessage from "../hooks/UseGetAllMessage.jsx";
+import UseGetRealTimeMessage from "../hooks/UseGetRealTimeMessage.jsx";
 
 const ChatMessages = ({ selectedUser }) => {
   UseGetRealTimeMessage();
